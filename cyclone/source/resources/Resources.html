@@ -1,0 +1,91 @@
+<html>
+<head>
+<title>Cyclone Resources and Filetypes Information</title>
+
+<body bgcolor="#ffffff">
+
+<h1>Cyclone Resources</h1>
+<ul>
+<li><a href="#app">Application</a></li>
+<li><a href="#command">Command Add-On</a></li>
+<li><a href="#interface">Interface Add-On</a></li>
+<li><a href="#idehelp">Help For BeIDE</a></li>
+<li><a href="#makehelp">Help For Makefiles</a></li>
+</ul>
+
+<hr>
+<a name="app"></a>
+<h2>Application</h2>
+
+<p>
+The Cyclone Application is tenatively of MIME type "application/x-be-executable", with Application Signature "application/x-vnd.cyclone-app" and should support the add-ons as documents which it could open. The Name of this type should be "Cyclone Application." Double clicking on an add-on should load the application normally but if it is an interface add-on, it should use that as the interface, and if it is a command add-on, it should load that add-on first. Similar rules should apply for multiple refs.
+</p>
+
+<pre>
+$ listattr Cyclone
+file Cyclone
+  Type         Size                 Name
+----------  ---------   -------------------------------
+  MIME str         28                         BEOS:TYPE
+0x4d49434e        256                   BEOS:M:STD_ICON
+0x52415754         20                        _trk/pinfo
+0x4d534747        111                   BEOS:FILE_TYPES
+  MIME str         30                      BEOS:APP_SIG
+0x41505046          4                    BEOS:APP_FLAGS
+0x41505056        680                  BEOS:APP_VERSION
+0x49434f4e       1024                   BEOS:L:STD_ICON
+</pre>
+
+<hr>
+
+<a name="command"></a>
+<h2>Command Add-Ons</h2>
+
+<p>
+Cyclone Command Add-Ons should not be of type "application/x-be-executable" like most add-ons, they should instead be of MIME type "applicatin/x-vnd.cyclone-command" with a name of "Cyclone Command Add-On." The default application for the document type should be "Cyclone."
+</p>
+
+<pre>
+$ listattr standard
+file standard
+  Type         Size                 Name
+----------  ---------   -------------------------------
+0x52415754         20                        _trk/pinfo
+  MIME str         34                         BEOS:TYPE
+</pre>
+<hr>
+
+<a name="interface"></a>
+<h2>Interface Add-Ons</h2>
+
+<p>
+Cyclone Interface Add-Ons should not be of type "application/x-be-executable" like most add-ons, they should instead be of MIME type "applicatin/x-vnd.cyclone-interface" with a name of "Cyclone Interface Add-On." The default application for the document type should be "Cyclone."
+</p>
+
+<pre>
+$ listattr interface_addon
+file interface_addon
+  Type         Size                 Name
+----------  ---------   -------------------------------
+  MIME str         36                         BEOS:TYPE
+0x52415754         20                        _trk/pinfo
+</pre>
+<hr>
+
+<a name="idehelp"></a>
+<h2>BeIDE Help</h2>
+
+<p>
+Resources are fun and easy with BeIDE. Also, opening up the Setting window, you can visit the Project&gt;PPC Project view and set the filetype correctly.
+</p>
+<hr>
+
+<a name="makehelp"></a>
+<h2>Makefile Help</h2>
+
+<p>
+I'm not sure how to do this automatically from a makefile. Either the resources aren't setup correctly or the BEOS:TYPE attribute needs to be set differently in the makefile somehow.</p>
+<hr>
+
+<a href="mailto:mlewinsk@newton.kamsc.k12.mi.us"><i>matt lewinski</i></a><br>
+Updated 00:00 EDT May 9 1998

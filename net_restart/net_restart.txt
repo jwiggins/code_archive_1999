@@ -1,0 +1,11 @@
+===================== 
+         File:  net_restart.zip
+       Author:  John Wiggins <john@ubermensch.net>
+      Release: 1.3 3/8/98
+Compatibility: PR2
+     Location: contrib/network
+  Description:  net_restart restarts networking from the command line
+        Notes:  this pogram was a quick hack for me to kill off dead socket[] threads
+	 when I wasn't in front of my computer. It has saved me gas money already :)
+	Now with (real) error checking! :) Now kills and restarts message_daemon too
+===================== 

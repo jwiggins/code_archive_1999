@@ -1,0 +1,1 @@
+#include <iostream.h>#include <string.h>#include <math.h>void main (){	int i,j=0,k=0;	char a[10];	cout << "Input a bianary number: " << endl;	cin.get(a,10);	int b=strlen(a)-1;	for(i=b;i>=0;i--)	{		if(a[i] == '1')		{j=j+pow(2,k);}		k++;	}	cout << j<< endl;}

@@ -1,0 +1,20 @@
+>I'm not quite following you here. I should have "old","new","verify"? Yes, 
+>I think that's what you meant. That's a good idea. I'll stick it on the 
+>list.
+
+yup that's exactly what's needed.
+
+>Hmm. Good idea. I remember how long it took me to figure out how the hell 
+>to add something to my bootscript.
+
+yup, but you also need to save the locked state to disk so when it reboots it 
+remembers.
+
+and a final feature request while I'm at it *g*
+
+in a future version add in "users" which are logged, for accounting purposes.
+Something like an XDM except as a BeDM :)  Which if you run it will ask you if 
+you want to Logout or Lock the terminal.  If you log out it kills all user 
+running apps and the tracker and desk bar then puts up a login screen.  If you 
+lock it does what BeCheckPoint was designed to do.  Plus a simple flag which 
+tells the program to go straight to BeDM mode.

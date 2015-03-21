@@ -1,0 +1,8 @@
+===================== 
+         File:  passcontrol.zip
+       Author:  John Wiggins <john@ubermensch.net>
+      Release: 1.1 4/20/98
+Compatibility: PR, PR2, R3
+     Location: contrib/develop
+  Description:  PassControl is a BTextControl object that masks what is being entered. Just pop it into your code, change a couple of things and it works! (theoretically. your mileage may vary) Competely free and ready to use in you app today. Now with multi-byte character support, a dynamic buffer for the "actual" password storage, and other tweaks
+===================== 

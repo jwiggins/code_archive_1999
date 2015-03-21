@@ -1,0 +1,5 @@
+*.o
+*.xMAP
+
+(Objects)/
+obj.x86/

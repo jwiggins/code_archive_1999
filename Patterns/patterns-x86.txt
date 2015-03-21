@@ -1,0 +1,8 @@
+===================== 
+         File:  patterns-x86.zip
+       Author:  John Wiggins <john@ubermensch.net>
+      Release: 1.0 4/12/98
+Compatibility: R3
+     Location: contrib/gfx
+  Description:  Patterns is a very simplistic graphic application that draws random patterns. You can change the patterns by moving a scrollbar from side to side. Source code is include for the curious and people who want to learn. (ie- heavily commented)
+===================== 

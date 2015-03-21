@@ -1,0 +1,14 @@
+Jellikit Changelog
+
+0.9 beta 3
+- Made Jellikit language neutral. You can now change all of Jellikit's displayed strings with a shell script.
+
+0.9 beta 2 -
+- Fixed crashing bug experienced when saving.
+- Fixed a bug where you could add attributes with duplicate names from the Add Attribute window.
+- Fixed the BoolAddon. It now works.
+- Found a bug in BFilePanel. The open panel won't allow multiple selection.(even though I told it to) To work around this, just drag and drop multiple files from the tracker onto any Jellikit window. (except the edit window)
+- Added IntegerAddon
+
+0.9 beta 1 -
+- Initial release. Too tired to know what bugs exist.

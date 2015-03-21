@@ -1,0 +1,25 @@
+--------------------------
+stats v 1.0
+by John Wiggins.
+--------------------------
+Stats is a simple shell program that tells you current statistics about your computer. It is especially usefull to you if you are logged into your computer. (the reason i wrote it in the first place :)
+what stats does:
+-shows cpu usage for all cpus
+-shows local time and date
+-shows uptime in days, hours, minutes
+-shows how many threads are running
+-shows used ram
+-and last but not least, gives the answer to is_computer_on() ;-)
+
+-------
+v1.1
+-------
+took out the ram usage stat after I found out how completely inaccurate it was from a Be representative.
+
+-------------
+load v 1.0
+-------------
+cpu monitor from the terminal pure and simple.
+
+Stats and load are freeware.
+Send bugs and comments to ubermensch@ubermensch.net

@@ -1,0 +1,37 @@
+net_restart v1.2 John Wiggins
+----------------
+This program is freeware. If you would really like to pay me something for it 
+because it has changed your life of something, send money(preferably) or free 
+copies of software you have made to:
+
+v1.0
+---------------
+- initial release
+
+v1.1
+---------------
+- error checking and retries! woohoo.
+
+v1.2
+---------------
+- real error checking..... (didnt have the BeBook when i did the first "error checking")
+- Big Thank You to Sebastien Bouchex for pointing out the nasty bug that would kill your 
+	system if net_server was already dead or otherwise not running.
+
+v1.3
+---------------
+- message_daemon reeaally hate having net_server killed while its running, so now i kill it first and restart it when im done.
+
+email: <john@ubermensch.net>
+
+btw: the author of this app would like to thank the author of Jukebox, who 
+kindly explained the wonders of BMessaging, and basically wrote this program :)
+and Sebastien Bouchex, who corrected my serious error.
+
+Some things you should know about this software:
+-----------------------------------------------
+- This app does not kill the telnet session (just the networking it relies on) that you are in the middle of. 
+(this will be addressed soon, i dont feel like messing with it right now) 
+- this app will end your telnet session when you use it (big surprise) 
+- This app is distributed "as-is", I am not responsible for anything that may happen to your computer as a result of using it. Back up your work and test this app in a "safe" situation before putting it to any real use. 
+- that is all i can think of right now

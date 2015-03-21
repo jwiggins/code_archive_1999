@@ -1,0 +1,10 @@
+Projects:
+
+- Distributed Bianary creation (or mail me the ppc version of my app):
+Programmer zips up sourcecode for app and ftp's it to some publicly accessable site. Then sends mail to special email addr. The program grabs mail for a specific email address every n minutes or so and looks for messages. The messages are a lot like makefiles. The program then makes a makefile from the message and builds the software, uploading it to a location it can access and alerting the sender of the email.
+
+- Serial Port GUI'd poker (or how to reverse engineer shitty hardware):
+Read and write to a user specified serial port. Basically a wrapper for BSerialPort. Maybe it could help bring my b/w quickcam out of retirement?
+
+- Beatnix (Beatnix explains all to nobody including xinu)
+OS

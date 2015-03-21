@@ -1,0 +1,10 @@
+Patterns v1.0
+John Wiggins
+
+This software is provided "as-is". I accept no responsibility if it does any damage to your computer. I have made sure to the best of my knowledge that is isnt a monster, but if anything bad happens don't come crying to me. (you get the idea already...)
+
+Patterns is a silly little app that makes random animated patterns based on the position of a miniscule little scrollbar. Don't ask me how it works, because I was pretty damned amazed to find out what that changing scrollbar value could do.
+
+Anywho. Because this app was basically just an exercise in messy code and general BeAPI classes, I have provided all the sources so that other people wishing to learn how to write BeApps could have some sample code to look at.
+
+Enjoy!
