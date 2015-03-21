@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <errno.h>
 
 #include <socket.h>
 #include <netdb.h>
@@ -41,7 +42,8 @@ private:
 	status_t _Connect(); // does the actual "firing up" of _WatchPort()
 	void _Disconnect();
 	
-	void debug_output(const char *);
+	void VelvetJones(const char *blah);
+	void PrincessDeluxe(char *blah, int32 size);
 };
 
 
@@ -62,7 +64,7 @@ NetInputDevice::NetInputDevice()
 	device[1] = NULL;
 	
 	// hello world!
-	debug_output("NetInputDevice: Hello World!");
+	//VelvetJones("NetInputDevice: Hello World!");
 	
 	// To listen on a specific port, make a file with this line _only_:
 	// NET_INPUT_PORT = <number between 0 and 65535>
@@ -75,23 +77,23 @@ NetInputDevice::NetInputDevice()
 	find_directory(B_USER_SETTINGS_DIRECTORY, &path);
 	path.Append("NetInputDevice"); // '/boot/home/config/settings/NetInputDevice'
 	
-	debug_output("NetInputDevice: opening the settings file...");
+	//VelvetJones("NetInputDevice: opening the settings file...");
 	settings_file = fopen(path.Path(), "r");
 	if(settings_file)
 	{
-		debug_output("NetInputDevice: Reading settings..");
+		//VelvetJones("NetInputDevice: Reading settings..");
 		fscanf(settings_file, "NET_INPUT_PORT = %d\n", &_Port);
 	}
 	else
 		_Port = 666; // default is 666
 	
-	debug_output("NetInputDevice: closing the settings file");
+	//VelvetJones("NetInputDevice: closing the settings file");
 	fclose(settings_file);
 	
 	// no socket yet
 	recv_socket = -1;
 	
-	debug_output("NetInputDevice: Registering with the input server.");
+	//VelvetJones("NetInputDevice: Registering with the input server.");
 	RegisterDevices(device);
 }
 
@@ -104,7 +106,7 @@ NetInputDevice::~NetInputDevice()
 
 status_t NetInputDevice::Start(const char *device, void *)
 {	
-	debug_output("NetInputDevice: Start()");
+	//VelvetJones("NetInputDevice: Start()");
 	
 	// only spawn here. don't resume. The fire and forget thread below will
 	// take care of that 
@@ -123,7 +125,7 @@ status_t NetInputDevice::Stop(const char *, void *)
 	kill_thread(_Thread);
 	_Disconnect();
 	
-	debug_output("NetInputDevice: Stop()");
+	//VelvetJones("NetInputDevice: Stop()");
 	return (B_NO_ERROR);
 }
 
@@ -136,21 +138,24 @@ int32 NetInputDevice::_StartWatchPort(void *arg)
 
 void NetInputDevice::_WatchPort()
 {
-	debug_output("NetInputDevice: Starting the listen thread");
-	ssize_t length, bytes_read;
-	char *buffer, *buffer_start, dbg_msg_buff[255];
-	BMessage *event;
+	//VelvetJones("NetInputDevice: Starting the listen thread");
+	ssize_t bytes_read;
+	union {
+		char raw_len[4];
+		size_t length;
+	}; // anonymous union so we can loop through the first recv() ( paranoia :)
+	char *buffer, *buffer_start;//,dbg_msg_buff[255];
+	BMessage *event = NULL;
 	status_t err = B_OK;
 	sockaddr_in sa;
 	int clientsize, clientsocket;
 	
-	
 	while (true)
 	{
-		
+		//VelvetJones("NetInputDevice: Calling accept()");
 		// block until someone connects to us
 		clientsocket = accept(recv_socket, (sockaddr *)&sa, &clientsize);
-		debug_output("NetInputDevice: accept() returned. somebody connected to us...");
+		//VelvetJones("NetInputDevice: accept() returned. somebody connected to us...");
 		
 		if(clientsocket < 0)
 		{
@@ -162,88 +167,120 @@ void NetInputDevice::_WatchPort()
 		while(err >= B_OK && clientsocket >= 0)
 		{
 			// Block until we find the size of the next message
-			debug_output("NetInputDevice: Calling recv()");
-			err = recv(clientsocket, &length, 4, 0); // read a long int off the net
+			//VelvetJones("NetInputDevice: Calling recv()");
 			
-			debug_output("NetInputDevice: recv() returned. wonder if we got anything...");
+			bytes_read = 0;
+			err = 1; // read loop won't run if this is 0 (B_OK)
+			// ultra-paranoid read loop
+			// read a long int off the net ( twisted. I know. )
+			// (can recv() ever read less than 4 bytes?)
+			while((err > 0) && (bytes_read < 4))
+			{
+				err = recv(clientsocket, &raw_len[bytes_read], (4 - bytes_read), 0);  // grab the data!
+				if(err > 0)
+				{
+					bytes_read += err; // add to the bytes_read counter
+				}
+			}
+			//err = recv(clientsocket, &length, 4, 0); // read a long int off the net
+			
+			//VelvetJones("NetInputDevice: recv() returned. wonder if we got anything...");
 			if(err > 0)
 			{
 				//sprintf(dbg_msg_buff, "NetInputDevice: length before swap = %d", length);
-				//debug_output(dbg_msg_buff);
+				//VelvetJones(dbg_msg_buff);
 				//memset(dbg_msg_buff, 0, 255);
 							
 				length = B_BENDIAN_TO_HOST_INT32(length); // byteswap from network to host
 				
-				sprintf(dbg_msg_buff, "NetInputDevice: length after swap = %d", length);
-				debug_output(dbg_msg_buff);
-				memset(dbg_msg_buff, 0, 255);
+				//sprintf(dbg_msg_buff, "NetInputDevice: length after swap = %d", length);
+				//VelvetJones(dbg_msg_buff);
+				//memset(dbg_msg_buff, 0, 255);
 				
-				buffer = (char*)malloc(length);
-				buffer_start = buffer; // cache a pointer to the first byte
+				buffer_start = buffer = (char*)malloc(length);
+				//buffer_start = buffer; // cache a pointer to the first byte
 				bytes_read = 0;
-				event = NULL;
+				err = 1; // read loop won't run if this is 0 (B_OK)
+				//event = NULL;
 				event = new BMessage();
 				
-				sprintf(dbg_msg_buff, "NetInputDevice: addr of buffer after malloc = %p", buffer);
-				debug_output(dbg_msg_buff);
-				memset(dbg_msg_buff, 0, 255);
+				//sprintf(dbg_msg_buff, "NetInputDevice: addr of buffer after malloc = %p", buffer);
+				//VelvetJones(dbg_msg_buff);
+				//memset(dbg_msg_buff, 0, 255);
 			
 				// read loop
-				while(err > 0 && bytes_read < length)
+				while((err > 0) && (bytes_read < length))
 				{
-					err = recv(clientsocket, buffer, length, 0);  // grab the data!
+					err = recv(clientsocket, buffer_start, (length - bytes_read), 0);  // grab the data!
 					if(err > 0)
 					{
 						bytes_read += err; // add to the bytes_read counter
-						buffer += err;
+						buffer_start += err; // advance the pointer
 					}
 				}
 				
-				buffer = buffer_start; // restore the pointer to the first byte
+				//PrincessDeluxe(buffer, length); // remote PrintToStream()
+				
+				//buffer = buffer_start; // restore the pointer to the first byte
 				buffer_start = NULL; // un-point buffer_start
 				
 				if(err < 0)
 				{
 					if(bytes_read >= 0)
 					{
-						debug_output("NetInputDevice: failed to read full packet");
+						//VelvetJones("NetInputDevice: failed to read full packet");
 					}
 					else
 					{
-						debug_output("NetInputDevice: recv error");
+						//VelvetJones("NetInputDevice: recv error");
 					}
 				}
 				else if ((err = event->Unflatten(buffer)) < 0)
 				{
-					debug_output("NetInputDevice: event->Unflatten(buffer) error (bad packet)");
-					debug_output(strerror(err));
+					//VelvetJones("NetInputDevice: event->Unflatten(buffer) error (bad packet)");
+					//VelvetJones(strerror(err));
 					err = B_OK; // don't want this error to kill our connection
 				}
 				else
 				{
-					debug_output("NetInputDevice: successfully grabbed a packet. Enqueuing...");
+					//VelvetJones("NetInputDevice: successfully grabbed a packet. Enqueuing...");
+					
+					// add the "when" (removed before sending across net)
+					event->AddInt64("when", system_time());
+					// add the "netmsg". (just a flag to keep the msg on this machine)
+					event->AddString("netmsg", "");
+					
 					EnqueueMessage(event);	
 					event = NULL;
 				}
 				
-				debug_output("NetInputDevice: freeing the message buffer");
-				sprintf(dbg_msg_buff, "NetInputDevice: addr of buffer before free = %p", buffer);
-				debug_output(dbg_msg_buff);
-				memset(dbg_msg_buff, 0, 255);
+				//VelvetJones("NetInputDevice: freeing the message buffer");
+				//sprintf(dbg_msg_buff, "NetInputDevice: addr of buffer before free = %p", buffer);
+				//VelvetJones(dbg_msg_buff);
+				//memset(dbg_msg_buff, 0, 255);
+				
 				free(buffer);
 				buffer = NULL;
-				debug_output("NetInputDevice: message buffer freed");
+				//VelvetJones("NetInputDevice: message buffer freed");
 				
 				if(event != NULL)
 				{
-					debug_output("NetInputDevice: deleting the event message");
+					//VelvetJones("NetInputDevice: deleting the event message");
 					delete(event);
 					event = NULL;
 				}
 				else
 				{
-					debug_output("NetInputDevice: no need to delete event message. looping...");
+					//VelvetJones("NetInputDevice: no need to delete event message. looping...");
 				}
+			}
+			else
+			{
+				//VelvetJones("NetInputDevice: nope. killing the client socket.");
+				//VelvetJones(strerror(errno));
+				if(clientsocket > 0)
+					closesocket(clientsocket); // clean up the client socket
+				clientsocket = -1;
 			}
 		}
 		if(clientsocket > 0)
@@ -289,7 +326,7 @@ status_t NetInputDevice::_Connect()
 	if(listen(recv_socket, 1) < 0)
 		return B_ERROR;
 	
-	debug_output("NetInputDevice: socket is bound and listening");
+	//VelvetJones("NetInputDevice: socket is bound and listening");
 	
 	// start the listen thread
 	// we do it here to avoid a nasty race condition.
@@ -306,10 +343,18 @@ void NetInputDevice::_Disconnect()
 	recv_socket = -1;
 }
 
-void NetInputDevice::debug_output(const char *blah)
+void NetInputDevice::VelvetJones(const char *blah)
 {
 	// very small chance that not tolerating a timeout would cause us
 	// to drop a message, but don't count on it.
 	// (not exactly a high traffic port, 'ol velvet... )
 	write_port_etc( find_port("_VelvetJones_"), 0, blah, strlen(blah),	B_TIMEOUT, 250);
+}
+
+void NetInputDevice::PrincessDeluxe(char *blah, int32 size)
+{
+	// very small chance that not tolerating a timeout would cause us
+	// to drop a message, but don't count on it.
+	// (not exactly a high traffic port, 'ol velvet... )
+	write_port_etc( find_port("_PrincessDeluxe_"), 0, blah, size,	B_TIMEOUT, 250);
 }

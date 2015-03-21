@@ -15,8 +15,7 @@ AttrWindow::AttrWindow(BRect frame, const char *title, BMessage *config_msg, BLo
 	int32		width = (int32)bounds.Width();
 	BScrollView *LeftScrollView;
 	ColumnListView *listview;
-	const char *string_ptr, *string_ptr2;
-	char *allocd_string;
+	const char *string_ptr;
 	
 	// init the addon manager messenger & attribute manager messenger
 	AddonMessenger = new BMessenger(NULL, addon_manager, NULL);
@@ -44,12 +43,8 @@ AttrWindow::AttrWindow(BRect frame, const char *title, BMessage *config_msg, BLo
 		B_WILL_DRAW|B_FRAME_EVENTS|B_NAVIGABLE,B_SINGLE_SELECTION_LIST,false,true,true,B_NO_BORDER);
 	listview->AddColumn(new CLVColumn(B_EMPTY_STRING,20.0,CLV_LOCK_WITH_RIGHT|CLV_MERGE_WITH_RIGHT,15.0));
 	
-	string_ptr = ((AttrApp *)be_app)->res_strings->String(STRING_ATTRIBUTE);
-	string_ptr2 = ((AttrApp *)be_app)->res_strings->String(STRING_NAME);
-	allocd_string = (char *)malloc(strlen(string_ptr) + strlen(string_ptr2) + 2);
-	sprintf(allocd_string, "%s %s", string_ptr, string_ptr2);
-	listview->AddColumn(new CLVColumn(allocd_string,200.0,0,95.0));
-	free(allocd_string);
+	string_ptr = ((AttrApp *)be_app)->res_strings->String(STRING_ATTR_NAME);
+	listview->AddColumn(new CLVColumn(string_ptr,200.0,0,95.0));
 	string_ptr = ((AttrApp *)be_app)->res_strings->String(STRING_TYPE);
 	listview->AddColumn(new CLVColumn(string_ptr,70.0,0,70.0));
 	
@@ -348,8 +343,7 @@ int32 AttrWindow::BuildMenubar(int32 width, int32 height)
 	BRect		rect(0,0, width, height);
 	BMenuBar	*menubar;
 	BMenu		*menu, *edit_menu;
-	const char	*string_ptr, *string_ptr2, *string_ptr3;
-	char 		*allocd_string;
+	const char	*string_ptr;
 	
 	menubar = new BMenuBar(rect, "menubar");
 	
@@ -382,25 +376,17 @@ int32 AttrWindow::BuildMenubar(int32 width, int32 height)
 	string_ptr = ((AttrApp *)be_app)->res_strings->String(STRING_EDIT);
 	edit_menu = new BMenu(string_ptr);
 	
-	string_ptr = ((AttrApp *)be_app)->res_strings->String(STRING_ADD);
-	string_ptr2 = ((AttrApp *)be_app)->res_strings->String(STRING_ATTRIBUTE);
-	allocd_string = (char *)malloc(strlen(string_ptr) + strlen(string_ptr2) + 2);
-	sprintf(allocd_string, "%s %s", string_ptr, string_ptr2);
-	edit_menu->AddItem(new BMenuItem(allocd_string, new BMessage(MAKE_NEW_ATTRIBUTE)));
-	free(allocd_string);
+	// Add Attr
+	string_ptr = ((AttrApp *)be_app)->res_strings->String(STRING_ADD_ATTR);
+	edit_menu->AddItem(new BMenuItem(string_ptr, new BMessage(MAKE_NEW_ATTRIBUTE)));
 	
-	string_ptr = ((AttrApp *)be_app)->res_strings->String(STRING_ADD);
-	string_ptr3 = ((AttrApp *)be_app)->res_strings->String(STRING_PREDEFINED);
-	allocd_string = (char *)malloc(strlen(string_ptr) + strlen(string_ptr2) + strlen(string_ptr3) + 3);
-	sprintf(allocd_string, "%s %s %s", string_ptr, string_ptr3, string_ptr2);
-	edit_menu->AddItem(new BMenu(allocd_string));
-	free(allocd_string);
+	// Add Predefined Attr
+	string_ptr = ((AttrApp *)be_app)->res_strings->String(STRING_ADD_PREDEF_ATTR);
+	edit_menu->AddItem(new BMenu(string_ptr));
 	
-	string_ptr = ((AttrApp *)be_app)->res_strings->String(STRING_REMOVE);
-	allocd_string = (char *)malloc(strlen(string_ptr) + strlen(string_ptr2) + 2);
-	sprintf(allocd_string, "%s %s", string_ptr, string_ptr2);
-	edit_menu->AddItem(new BMenuItem(allocd_string, new BMessage(REMOVE_ATTRIBUTE)));
-	free(allocd_string);
+	// Remove Attr
+	string_ptr = ((AttrApp *)be_app)->res_strings->String(STRING_REMOVE_ATTR);
+	edit_menu->AddItem(new BMenuItem(string_ptr, new BMessage(REMOVE_ATTRIBUTE)));
 	//((BMenuItem *)edit_menu->ItemAt(0))->SetEnabled(false);
 	//((BMenuItem *)edit_menu->ItemAt(1))->SetEnabled(false);
 	

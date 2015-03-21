@@ -1,0 +1,5 @@
+#!/bin/sh
+/system/servers/input_server -q
+sleep 10
+mv ~/config/add-ons/input_server/devices/NetInputDevice ~/
+mv ~/config/add-ons/input_server/filters/NetInputFilter ~/

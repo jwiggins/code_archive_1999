@@ -48,7 +48,8 @@ AboutView::AboutView(BRect frame)
 	
 	// now set it's text to something interesting
 	text_view->SetText(
-		"1998-1999 by John Wiggins\n\nThanks to Dominic Giampaolo for writing bfs\n\n"
+		"1998-1999 by John Wiggins\n\n"
+		"Thanks to Dominic Giampaolo for writing bfs\n\n"
 		"Thanks to Brian Tietz for writing Santa's gift bag\n\n"
 		"And finally... Thanks to Primus for writing Jellikit, the song that this app was named after...\n\n");
 	

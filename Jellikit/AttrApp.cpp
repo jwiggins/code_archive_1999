@@ -35,7 +35,7 @@ AttrApp::AttrApp()
 		//printf("error\n");
 		string_ptr1 = res_strings->String(STRING_NO_MANAGER_WARNING);
 		//printf("got \"no manager\" string. %s\n", string_ptr1);
-		string_ptr2 = res_strings->String(STRING_ADDON);
+		string_ptr2 = "add-on";
 		//printf("got \"add-on\" string. %s\n", string_ptr2);
 		string_ptr3 = res_strings->String(STRING_OK);
 		//printf("got \"ok\" string. %s\n", string_ptr3);
@@ -61,7 +61,7 @@ AttrApp::AttrApp()
 		if(err < B_NO_ERROR)
 		{
 			string_ptr1 = res_strings->String(STRING_NO_MANAGER_WARNING);
-			string_ptr2 = res_strings->String(STRING_ATTRIBUTE);
+			string_ptr2 = "attribute";
 			string_ptr3 = res_strings->String(STRING_OK);
 			allocd_string = (char *)malloc(strlen(string_ptr1) + strlen(string_ptr2) + 1);
 			sprintf(allocd_string, string_ptr1, string_ptr2);
@@ -75,12 +75,8 @@ AttrApp::AttrApp()
 		{
 			// construct the "Add Attribute" window
 			rect.Set(150,100, 399,219);
-			string_ptr1 = res_strings->String(STRING_ADD);
-			string_ptr2 = res_strings->String(STRING_ATTRIBUTE);
-			allocd_string = (char *)malloc(strlen(string_ptr1) + strlen(string_ptr2) + 2);
-			sprintf(allocd_string, "%s %s", string_ptr1, string_ptr2);
-			the_addattr_window = new AddAttrWindow(rect, allocd_string, the_addon_manager, the_attr_manager);
-			free(allocd_string);
+			string_ptr1 = res_strings->String(STRING_ADD_ATTR);
+			the_addattr_window = new AddAttrWindow(rect, string_ptr1, the_addon_manager, the_attr_manager);
 			// construct the AttrMessenger
 			AttrMessenger = new BMessenger(the_attr_manager);
 		}

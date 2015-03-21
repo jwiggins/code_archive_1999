@@ -13,7 +13,7 @@ JellikitAboutWindow::JellikitAboutWindow(BRect frame, bool have_media)
 	BResources *resources;
 	const void *sound_rez = NULL;
 	
-	resources = be_app->AppResources(); // mmmm Easy API ™
+	resources = be_app->AppResources(); // mmmm Easy API
 	sound_rez = resources->LoadResource(B_RAW_TYPE, "jellikit:sound", &rez_size); // grab a pointer to the sound
 	
 	if(sound_rez != NULL)
@@ -42,7 +42,7 @@ bool JellikitAboutWindow::QuitRequested()
 	//printf("AboutWindow::QuitRequested\n");
 	free(sound_ptr);
 	be_app->PostMessage(ABOUT_BOX_DYING);
-	return BWindow::QuitRequested();
+	return true;
 }
 
 void JellikitAboutWindow::MessageReceived(BMessage *msg)
@@ -54,16 +54,19 @@ void JellikitAboutWindow::MessageReceived(BMessage *msg)
 		{			
 			//printf("JellikitAboutWindow: got an easter egg message.\n");
 			// jellikit.raw is 16bit stereo lendian
-			if(sound_ptr == NULL) // fail if we don't have the sound
-				break;
-			//printf("JellikitAboutWindow: sound_ptr is valid.\n");
-			if(!media_server_is_alive)
-				break;
-			//printf("JellikitAboutWindow: media_server is alive.\n");
 			
-			if(find_thread("jellikit:easteregg") < 0)
+			// fail if we don't have the sound or media services
+			if((sound_ptr == NULL) || !media_server_is_alive) 
+				;
+			else
 			{
-				resume_thread(spawn_thread(EasterEgg, "jellikit:easteregg", B_NORMAL_PRIORITY, (void *)this));
+				//printf("JellikitAboutWindow: sound_ptr is valid.\n");
+				//printf("JellikitAboutWindow: media_server is alive.\n");
+				
+				if(find_thread("jellikit:easteregg") < 0)
+				{
+					resume_thread(spawn_thread(EasterEgg, "jellikit:easteregg", B_NORMAL_PRIORITY, (void *)this));
+				}
 			}
 			
 			break;

@@ -19,7 +19,7 @@ AddAttrWindow::AddAttrWindow(BRect frame, const char *title, BLooper *addon_mana
 	BMenuField *attribute_types_menu_field;
 	BButton *ok_button, *cancel_button;
 	BMessage *type_msg;
-	const char *string_ptr, *string_ptr2;
+	const char *string_ptr;
 	char *allocd_string;
 	
 	// the addon manager BMessenger
@@ -33,13 +33,9 @@ AddAttrWindow::AddAttrWindow(BRect frame, const char *title, BLooper *addon_mana
 	// the "Predefined attribute" menu
 	rect.Set(interfaceUnit, interfaceUnit, frame.Width() - interfaceUnit, interfaceUnit*3);
 	mime_menu = new BMenu("        ");
-	string_ptr = ((AttrApp *)be_app)->res_strings->String(STRING_PREDEFINED);
-	string_ptr2 = ((AttrApp *)be_app)->res_strings->String(STRING_ATTRIBUTE);
-	allocd_string = (char *)malloc(strlen(string_ptr) + strlen(string_ptr2) + 2);
-	sprintf(allocd_string, "%s %s", string_ptr, string_ptr2);
-	mime_menu_field = new BMenuField(rect, "mimemenu", allocd_string, mime_menu);
-	mime_menu_field->SetDivider(be_plain_font->StringWidth(allocd_string) + 5.);
-	free(allocd_string);
+	string_ptr = ((AttrApp *)be_app)->res_strings->String(STRING_PREDEF_ATTR);
+	mime_menu_field = new BMenuField(rect, "mimemenu", string_ptr, mime_menu);
+	mime_menu_field->SetDivider(be_plain_font->StringWidth(string_ptr) + 5.);
 	// the "Name: " text entry field
 	string_ptr = ((AttrApp *)be_app)->res_strings->String(STRING_NAME);
 	allocd_string = (char *)malloc(strlen(string_ptr) + 3);
@@ -240,7 +236,12 @@ void AddAttrWindow::MessageReceived(BMessage *msg)
 				current_window_id = win_id;
 				
 			}
-			Show();
+			if(IsHidden())
+				Show();
+			else if(IsMinimized())
+				Minimize(false);
+			else
+				Activate();
 			break;
 		}
 		case ADD_ATTR_OK:

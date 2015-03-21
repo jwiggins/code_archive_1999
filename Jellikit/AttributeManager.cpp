@@ -253,6 +253,7 @@ void AttributeManager::MessageReceived(BMessage *msg)
 				// the invoker owns this message. we don't have to delete it.
 				
 				alert->Go(new BInvoker(invoker_msg, this));
+				invoker_msg = NULL;
 			}
 			else
 			{

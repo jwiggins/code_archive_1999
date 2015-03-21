@@ -38,9 +38,11 @@ private:
 	
 	void _Connect(short,long);
 	void _ConnectionDied();
-	void debug_output(const char *);
+	
+	void VelvetJones(const char *blah);
+	void PrincessDeluxe(char *blah, int32 size);
 
-	port_id _CommandPort, _NetQueuePort, _debug_port;
+	port_id _CommandPort, _NetQueuePort;
 	int32 _InputLockMode;
 	int	_Remotesocket;
 	bool _currently_sending;
@@ -58,27 +60,27 @@ NetInputFilter::NetInputFilter()
 	_Remotesocket = -1;
 	_QueueThread = -1; // no queue thread yet
 	_currently_sending = false;
-	_debug_port = find_port("_VelvetJones_");
+	//_debug_port = find_port("_VelvetJones_");
 	
 	
-	debug_output("NetInputFilterPort: Hello World!");
+	VelvetJones("NetInputFilterPort: Hello World!");
 	
 	_NetQueuePort = create_port(1,"NetInputFilterPort:net"); // one message deep
 	_CommandPort = create_port(100,"NetInputFilterPort:cmd");
 	
-	debug_output("NetInputFilterPort: ports were created.");
+	VelvetJones("NetInputFilterPort: ports were created.");
 	
 	if(_CommandPort < 0 || _NetQueuePort < 0)
 	{
-		debug_output("inputRecorderFilter: create_port error for the command port or the net queue port");
+		VelvetJones("inputRecorderFilter: create_port error for the command port or the net queue port");
 	}
 	
-	debug_output("NetInputFilterPort: spawning the command thread");
+	VelvetJones("NetInputFilterPort: spawning the command thread");
 	// the command thread
 	_WatchThread = spawn_thread(_StartWatchPort, "NetInputFilter:cmd", B_REAL_TIME_DISPLAY_PRIORITY+4, this);
 	resume_thread(_WatchThread);
 	
-	debug_output("NetInputFilterPort: ready to rock and roll");
+	VelvetJones("NetInputFilterPort: ready to rock and roll");
 }
 
 NetInputFilter::~NetInputFilter()
@@ -119,21 +121,21 @@ void NetInputFilter::_WatchPort(void)
 			event = NULL;
 			event = new BMessage();
 			err = read_port(_CommandPort, &code, buffer, length);
-			debug_output("NetInputFilterPort: got a command msg...");
+			VelvetJones("NetInputFilterPort: got a command msg...");
 			if(err != length)
 			{
 				if(err >= 0)
 				{
-					debug_output("NetInputFilterPort:failed to read full packet");
+					VelvetJones("NetInputFilterPort:failed to read full packet");
 				}
 				else
 				{
-					debug_output("NetInputFilterPort: read_port error");
+					VelvetJones("NetInputFilterPort: read_port error");
 				}
 			}
 			else if ((err = event->Unflatten(buffer)) < 0)
 			{
-				debug_output("NetInputFilterPort: event->Unflatten(buffer) encountered an error");
+				VelvetJones("NetInputFilterPort: event->Unflatten(buffer) encountered an error");
 			}
 			else
 			{
@@ -141,7 +143,7 @@ void NetInputFilter::_WatchPort(void)
 				{
 					case FILTER_START:
 					{
-						debug_output("NetInputFilterPort: FILTER_START message");
+						VelvetJones("NetInputFilterPort: FILTER_START message");
 						// create a socket to the remote host and start passing
 						// input to it.
 						// message contains:
@@ -162,7 +164,7 @@ void NetInputFilter::_WatchPort(void)
 					}
 					case FILTER_STOP:
 					{
-						debug_output("NetInputFilterPort: FILTER_STOP message");
+						VelvetJones("NetInputFilterPort: FILTER_STOP message");
 						// terminate the connection with extreme predjudice
 						// the input device on the remote end should get an
 						// error message from recv() if this is successful
@@ -173,7 +175,7 @@ void NetInputFilter::_WatchPort(void)
 					}
 					case FILTER_LOCKOUT:
 					{
-						debug_output("NetInputFilterPort: FILTER_LOCKOUT message");
+						VelvetJones("NetInputFilterPort: FILTER_LOCKOUT message");
 						// toggle sending of input messages. The scroll lock key
 						// has the same effect.
 						bool mode;
@@ -182,19 +184,19 @@ void NetInputFilter::_WatchPort(void)
 							if(mode)
 							{
 								_InputLockMode = 1;
-								debug_output("NetInputFilterPort: _InputLockMode = 1");
+								VelvetJones("NetInputFilterPort: _InputLockMode = 1");
 							}
 							else
 							{
 								_InputLockMode = 0;
-								debug_output("NetInputFilterPort: _InputLockMode = 0");
+								VelvetJones("NetInputFilterPort: _InputLockMode = 0");
 							}
 						}
 						break;
 					}
 					default:
 					{
-						debug_output("NetInputFilterPort: message not understood");
+						VelvetJones("NetInputFilterPort: message not understood");
 						break;
 					}
 				}
@@ -221,38 +223,48 @@ void NetInputFilter::_QueuePort(void)
 {
 	int32 code;
 	ssize_t length, temp_length;
-	char *buffer, dbg_msg_buff[255];
+	char *buffer, *buffer_start;//, dbg_msg_buff[255];
 	status_t err;
 
 	while (true)
 	{
 		// Block until we find the size of the next message
 		length = port_buffer_size(_NetQueuePort);
-		buffer = (char *)malloc(length);
+		buffer_start = buffer = (char *)malloc(length);
 		err = read_port(_NetQueuePort, &code, buffer, length);
-		debug_output("NetInputFilterPort: got a message to pipe across the net!");
-		sprintf(dbg_msg_buff, "NetInputFilterPort: length = %ld", length);
-		debug_output(dbg_msg_buff);
-		memset(dbg_msg_buff, 0, 255);
+		
+		//VelvetJones("NetInputFilterPort: got a message to pipe across the net!");
+		
+		//sprintf(dbg_msg_buff, "NetInputFilterPort: length = %ld", length);
+		//VelvetJones(dbg_msg_buff);
+		//memset(dbg_msg_buff, 0, 255);
+		
+		//PrincessDeluxe(buffer, length); // BMessage debug output
+		
 		if(err != length)
 		{
+			//VelvetJones("NetInputFilterPort: err != length");
 			if(err >= 0)
 			{
-				debug_output("NetInputFilterPort: failed to read full packet (port)");
+				//VelvetJones("NetInputFilterPort: failed to read full packet (port)");
 			}
 			else
 			{
-				debug_output("NetInputFilterPort: read_port error");
+				//VelvetJones("NetInputFilterPort: read_port error");
 			}
 		}
-		else if(_Remotesocket > 0)
+		else if(_Remotesocket >= 0)
 		{
 			// fire that puppy off to neverneverland
+			//VelvetJones("NetInputFilterPort: Sending...");
+			
 			temp_length = B_HOST_TO_BENDIAN_INT32(length); // swapped length
 			err = send(_Remotesocket, &temp_length, 4, 0); // send the swapped length
 			if(err < 0)
 			{
 				// bail in case of error
+				//VelvetJones("NetInputFilterPort: Send error");
+				
 				free(buffer); // free the buffer (cuz this is our last chance :)
 				_ConnectionDied(); // this call will kill us
 			}
@@ -263,7 +275,7 @@ void NetInputFilter::_QueuePort(void)
 				// send loop
 				while(err > 0 && bytes_sent < length)
 				{
-					err = send(_Remotesocket, buffer, length, 0);  // send the data!
+					err = send(_Remotesocket, buffer, (length - bytes_sent), 0);  // send the data!
 					if(err > 0)
 					{
 						bytes_sent += err; // add to the bytes_sent counter
@@ -271,39 +283,57 @@ void NetInputFilter::_QueuePort(void)
 					}
 				}
 				
+				buffer = buffer_start; // restore the pointer
+				
 				if(err < 0)
 				{
 					// bail in case of error
+					//VelvetJones("NetInputFilterPort: Send error");
 					free(buffer); // free the buffer (cuz this is our last chance :)
 					_ConnectionDied(); // this call will kill us
 				}
 				else
-					debug_output("NetInputFilterPort: successful send to remote locale");
+					;//VelvetJones("NetInputFilterPort: successful send to remote locale");
 			}
 		}
+		else
+		{
+			//VelvetJones("NetInputFilterPort: _Remotesocket is invalid");
+		}
 		free(buffer); // free the buffer
+		buffer_start = buffer = NULL;
 	}
 }
 
 filter_result NetInputFilter::Filter(BMessage *message, BList *)
 {
+	bool from_network;
+	const char *dummy;
 	status_t err;
+	bigtime_t when;
 	filter_result res = B_DISPATCH_MESSAGE;
+	
+	// don't propogate messages that came in off the network
+	from_network = (message->FindString("netmsg",&dummy) == B_OK);
 		
 	// if the user has locked the input, then skip the message.
 	// (but still fire it out to the remote machine (maybe))
-	if(_InputLockMode)
+	if(from_network || _InputLockMode)
 	{
 		res = B_SKIP_MESSAGE;
 	}
 	
 	if(modifiers() & B_SCROLL_LOCK || !_currently_sending)
 	{
-		// don't send it abroad
+		// don't send it abroad, and give the user their control back
 		res = B_DISPATCH_MESSAGE; // so we can save ourselves with the scroll lock
 	}
-	else if(_QueueThread > 0)
+	else if(_QueueThread > 0 && !from_network)
 	{
+		// remove this before taking the size
+		if(message->FindInt64("when", &when) == B_OK)
+			message->RemoveName("when");
+		
 		// send it abroad
 		size_t length = message->FlattenedSize();
 		char *stream=(char *)malloc(length);
@@ -316,7 +346,7 @@ filter_result NetInputFilter::Filter(BMessage *message, BList *)
 				if(err == B_WOULD_BLOCK)
 				{
 					// full queue. deal with it
-					debug_output("NetInputFilterPort: dropped a packet.");
+					//VelvetJones("NetInputFilterPort: dropped a packet.");
 					
 					// remove the "when" field from the messages. it has not meaning on a
 					// remote machine.
@@ -340,8 +370,13 @@ filter_result NetInputFilter::Filter(BMessage *message, BList *)
 					;
 				}
 			}
+			
+			// clean up
 			free(stream);
 		}
+		
+		// put the "when" back (the time difference should not be significant)
+		message->AddInt64("when", when);
 	}	
 	return (res);
 }
@@ -353,12 +388,12 @@ void NetInputFilter::_Connect(short host_port, long host_addr)
 	if(_Remotesocket < 0)
 	{
 		sockaddr_in sa;
-		char buffer[256];
+		//char buffer[256];
 		
-		sprintf(buffer, " before swap: host_addr = %x, host_port = %d", host_addr, host_port);						
+		//sprintf(buffer, " before swap: host_addr = %x, host_port = %d", host_addr, host_port);						
 		
-		debug_output("NetInputFilterPort: connecting to remote host");
-		debug_output(buffer);
+		//VelvetJones("NetInputFilterPort: connecting to remote host");
+		//VelvetJones(buffer);
 		
 		_Remotesocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 		if(_Remotesocket < 0)
@@ -370,21 +405,21 @@ void NetInputFilter::_Connect(short host_port, long host_addr)
 			sa.sin_addr.s_addr = host_addr;//htonl(host_addr);
 			memset(sa.sin_zero, 0, sizeof(sa.sin_zero));
 			
-			memset(buffer,0,256);
-			sprintf(buffer, "after swap: host_addr = %x, host_port = %d", sa.sin_addr.s_addr, sa.sin_port);
-			debug_output(buffer);
+			//memset(buffer,0,256);
+			//sprintf(buffer, "after swap: host_addr = %x, host_port = %d", sa.sin_addr.s_addr, sa.sin_port);
+			//VelvetJones(buffer);
 			
 			err = connect(_Remotesocket, (sockaddr *)&sa, sizeof(sa));
 			if(err < 0)
 			{
 				closesocket(_Remotesocket);
 				_Remotesocket = -1;
-				debug_output("NetInputFilterPort: failed creation of remote socket");
+				//VelvetJones("NetInputFilterPort: failed creation of remote socket");
 			}
 			else
 			{
 				_currently_sending = true;
-				debug_output("NetInputFilterPort: successful creation of remote socket");
+				//VelvetJones("NetInputFilterPort: successful creation of remote socket");
 				
 				// now create the queue thread and start it
 				_QueueThread = spawn_thread(_StartQueuePort, "NetInputFilter:net", B_REAL_TIME_DISPLAY_PRIORITY+4, this);
@@ -404,16 +439,21 @@ void NetInputFilter::_ConnectionDied()
 	_Remotesocket = -1;
 	// hit the off switch
 	_currently_sending = false;
-	debug_output("NetInputFilterPort: Remote connection died.");
+	//VelvetJones("NetInputFilterPort: Remote connection died.");
 }
 
-void NetInputFilter::debug_output(const char *blah)
+void NetInputFilter::VelvetJones(const char *blah)
 {
-	if(_debug_port > 0)
-	{
-		// very small chance that not tolerating a timeout would cause us
-		// to drop a message, but don't count on it.
-		// (not exactly a high traffic port, 'ol velvet... )
-		write_port_etc( _debug_port, 0, blah, strlen(blah), B_TIMEOUT, 250);
-	}
+	// very small chance that not tolerating a timeout would cause us
+	// to drop a message, but don't count on it.
+	// (not exactly a high traffic port, 'ol velvet... )
+	write_port_etc( find_port("_VelvetJones_"), 0, blah, strlen(blah),	B_TIMEOUT, 250);
+}
+
+void NetInputFilter::PrincessDeluxe(char *blah, int32 size)
+{
+	// very small chance that not tolerating a timeout would cause us
+	// to drop a message, but don't count on it.
+	// (not exactly a high traffic port, 'ol velvet... )
+	write_port_etc( find_port("_PrincessDeluxe_"), 0, blah, size,	B_TIMEOUT, 250);
 }

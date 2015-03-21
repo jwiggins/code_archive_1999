@@ -1,5 +1,10 @@
 Jellikit Changelog
 
+0.9 beta 6
+- Fixed some stuff with showing and hiding the Add Attribute window
+- Totally revamped the ChangeLanguageToEnglish.sh script. I'll keep doing this until people tell me that it ruins their world every time I decide to screw around with my string resources. :) I shouldn't have to do this kinda thing again though.
+- Finally got attribute dragging to look presentable. (yay!) It looks exactly like a tracker drag now. (no nasty drawing problems anymore)
+
 0.9 beta 5
 - Made all Alerts asynchronous. No more blocked windows that can't redraw themselves.
 - Added an alert that asks you if you want to save when closing if the file has changed. (took me long enough eh?)

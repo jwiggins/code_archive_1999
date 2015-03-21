@@ -13,6 +13,4 @@ To use:
 Known Bugs:
 - Copying an attribute from one window to another when an attribute with the same name already exists in the destination window will erase the title of the Edit window if you overwrite the attribute in the destination window with the one you are dragging. Not destructive, but really hard to explain, and will take a little while to figure out and fix.
 - The BRectAddon can only display, actual editing does not work. Be happy it doesn't crash :)
-- No nifty icon yet :(
-- No nifty representation of a dragged attribute.
 - You tell me what you find (john@ubermensch.net or john@beoscentral.com)
