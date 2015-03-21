@@ -1,6 +1,6 @@
 /*
 
-	AddonManager.cpp
+	AddonManager.cpp - manage them add-ons !
 	John Wiggins 1998
 
 */
@@ -18,7 +18,7 @@ AddonManager::AddonManager()
 	image_id addonId;
 	
 	status_t err = B_NO_ERROR;
-	int32 numentries=0,i=0;
+	int32 numentries=0;
 	app_info info; 
 	BPath path;
 	
@@ -126,7 +126,7 @@ AddonManager::GetAddonForType(type_code type)
 	//printf("AddonManager::GetAddonForType()\n");
 	int32 i=0;
 	AddOnWrapper *list_item;
-	while(list_item = (AddOnWrapper *)addon_list->ItemAt(i++))
+	while((list_item = (AddOnWrapper *)addon_list->ItemAt(i++)) != NULL)
 	{
 		//printf("AddonManager::GetAddonForType(). while loop.\n");
 		if(list_item->SupportsType(&type))

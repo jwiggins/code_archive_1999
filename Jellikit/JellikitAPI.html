@@ -1,0 +1,84 @@
+<html>
+<head>
+<title>The Jellikit add-on API</title>
+</head>
+<body bgcolor="#ffffff" link="#ff0000">
+
+<center><h2>The Jellikit add-on API</h2></center>
+
+<p> This document comprises an overview of the Jellikit add-on API as 
+it stands right now (version 0.9). Since Jellikit is still young 
+and no other developer (to my knowledge) has released or even told me 
+about their add-ons, this API is subject to change at any time. The reason 
+for this is that I would like to resolve any stupidity in the current API 
+before more than one developer (me) is effected.
+<p>Please send any suggestions/comments to john@ubermensch.net. Your input is 
+important to me.
+<br>
+<br>
+<p>And now for the guts.
+<br>
+<hr>
+<h3>Exports</h3>
+<p>Every Jellikit add-on must export two important symbols, the Instantiate() 
+function prototype and the TypeCode[] array. Since Jellikit add-ons are c++, you will 
+need to wrap these exports in 'extern "C"' so that Jellikit can find them. For Example:<br>
+<pre>
+extern "C" 
+{
+	_EXPORT void Instantiate(...);
+	_EXPORT type_code TypeCode[] = {... , (type_code)NULL};
+}
+</pre>
+<h4><i>AttrAddon * Instantiate(BRect frame, const char *name, uint32 resizeMask, uint32 flags, BMessage *msg, status_t *ret)</i></h4>
+<p>This function simply instantiates and returns a new instance your add-on.
+<h4><i>type_code TypeCode[]</i></h4>
+An array holding the type(s) of data that your add-on knows how to manipulate. All the 
+common Be-defined types are in support/TypeConstants.h.
+<hr>
+<h3>AttrAddon</h3>
+<p>Derived from: <b>BView</b><br>
+Declared in: <b>AttrAddon.h</b>
+<h4>Constructor</h4>
+<p><i>AttrAddon(BRect frame, const char *name, uint32 resizeMask, uint32 flags, BMessage *msg, status_t *ret)</i><br>
+<br>
+frame, name, resizeMask, and flags are all from the BView constructor. msg is a BMessage 
+containing three fields: <br>
+<ul>
+<li> "typecode" - the type_code of the data to be edited.
+<li> "data" - a pointer to data you are to edit. You will need to make your own copy.
+<li> "datasize" - int32 telling you how big the data is (in bytes)
+</ul>
+The last argument ret is used to indicate success or failure. If your add-on was unable to 
+create an instance of itself for some reason, set ret to B_ERROR. Otherwise, set it to B_NO_ERROR.
+<br>
+<h4>Destructor</h4>
+<p>Does nothing. If you need to do any cleanup, do it here.
+<br>
+<h4>Members</h4>
+<p><i>virtual status_t GetData(BMessage *msg)</i><br>
+<br>
+This function is used by Jellikit to get the edited attribute from your addon. You need to add 
+a feild named "data" to the message that contains your attribute. If your add-on cannot grant 
+this request for any reason, it should return B_ERROR. It it succeeds, it should return B_NO_ERROR.
+<br>
+<p><i>virtual status_t ChangeData(BMessage *msg)</i><br>
+<br>
+This function is used to swap out the data an add-on is currently editing with new data. Jellikit 
+will call GetData() before calling ChangeData(). The msg argument contains the exact same fields as 
+the BMessage passed to your add-on in its constructor. (this is mostly a lie. Jellikit does not 
+currently use the ChangeData() function. All the current Jellikit add-ons are written to only 
+look for a field named "data". Both of these things will change soon.)
+<br>
+<p><i>virtual bool IsDirty() const</i><br>
+<br>
+Jellikit uses this function to find out if the data your add-on is currently editing has changed 
+since construction. Return true if the data has changed and false if it hasn't. If you encounter an 
+error, return false.
+<br>
+<hr>
+
+<p><i>John Wiggins 1999</i>
+
+</body>
+</html>

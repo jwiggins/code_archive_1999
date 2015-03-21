@@ -1,11 +1,17 @@
+/*
+
+	AboutWindow.cpp - A standard about window. (with easter egg)
+	John Wiggins 1998-1999
+
+*/
+
 #include "AboutWindow.h"
 
 JellikitAboutWindow::JellikitAboutWindow(BRect frame, bool have_media)
-: BWindow(frame, "", /*B_TITLED_WINDOW_LOOK*/B_MODAL_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL, B_NOT_ZOOMABLE|B_NOT_RESIZABLE), media_server_is_alive(have_media)
+: BWindow(frame, "", B_MODAL_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL, B_NOT_ZOOMABLE|B_NOT_RESIZABLE), media_server_is_alive(have_media)
 {
 	BResources *resources;
 	const void *sound_rez = NULL;
-	status_t err = B_ERROR;
 	
 	resources = be_app->AppResources(); // mmmm Easy API ™
 	sound_rez = resources->LoadResource(B_RAW_TYPE, "jellikit:sound", &rez_size); // grab a pointer to the sound

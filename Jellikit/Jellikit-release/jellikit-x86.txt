@@ -1,7 +1,7 @@
 ===================== 
          File: Jellikit-x86.zip
        Author: John Wiggins
-      Release: 0.9 beta 3
+      Release: 0.9 beta 4
 Compatibility: R4 x86
      Location: contrib/util
   Description: An extensible attribute editor

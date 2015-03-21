@@ -9,7 +9,7 @@
 #include "AttrItem.h"
 
 AttrWindow::AttrWindow(BRect frame, const char *title, BMessage *config_msg, BLooper *addon_manager, BLooper *attribute_manager, EditorWindow *edit_window, AddAttrWindow *add_attr_window, int32 id)
-			: BWindow(frame, title, B_DOCUMENT_WINDOW_LOOK,B_NORMAL_WINDOW_FEEL,/*B_WILL_ACCEPT_FIRST_CLICK*//*B_ASYNCHRONOUS_CONTROLS*/0), _id_(id)
+			: BWindow(frame, title, B_DOCUMENT_WINDOW_LOOK,B_NORMAL_WINDOW_FEEL,0), _id_(id), ok_to_quit(false)
 {
 	BRect		rect, bounds = frame;
 	int32		width = (int32)bounds.Width();
@@ -39,7 +39,7 @@ AttrWindow::AttrWindow(BRect frame, const char *title, BMessage *config_msg, BLo
 	//config_msg->PrintToStream();
 	
 	// add the AttrListView and its scroller
-	rect.Set(0, menu_bottom, width - (B_V_SCROLL_BAR_WIDTH + 1), bounds.bottom - (B_H_SCROLL_BAR_HEIGHT + 1));
+	rect.Set(0, menu_bottom, width - B_V_SCROLL_BAR_WIDTH, bounds.bottom - B_H_SCROLL_BAR_HEIGHT);
 	listview = new ColumnListView(rect,&LeftScrollView,"Attribute List",B_FOLLOW_ALL_SIDES,
 		B_WILL_DRAW|B_FRAME_EVENTS|B_NAVIGABLE,B_SINGLE_SELECTION_LIST,false,true,true,B_NO_BORDER);
 	listview->AddColumn(new CLVColumn(B_EMPTY_STRING,20.0,CLV_LOCK_WITH_RIGHT|CLV_MERGE_WITH_RIGHT,15.0));
@@ -65,12 +65,40 @@ AttrWindow::AttrWindow(BRect frame, const char *title, BMessage *config_msg, BLo
 
 bool AttrWindow::QuitRequested()
 {
+	if(!ok_to_quit)
+	{
+		BMessage save_check(IS_FILE_DIRTY), reply;
+	
+		save_check.AddInt32("win id", _id_);
+		AttributeMessenger->SendMessage(&save_check, &reply);
+		//reply.PrintToStream();
+		if(reply.what == ANSWER_YES)
+		{
+			// save
+			BAlert *alert;
+			const char *string_ptr1, *string_ptr2, *string_ptr3;
+			char *allocd_string;
+			
+			string_ptr1 = ((AttrApp *)be_app)->res_strings->String(STRING_SAVE_BEFORE_CLOSE);
+			string_ptr2 = Title();
+			
+			allocd_string = (char *)malloc(strlen(string_ptr1) + strlen(string_ptr2) + 1);
+			sprintf(allocd_string, string_ptr1, string_ptr2);
+			
+			string_ptr1 = ((AttrApp *)be_app)->res_strings->String(STRING_CANCEL);
+			string_ptr2= ((AttrApp *)be_app)->res_strings->String(STRING_DONT_SAVE);
+			string_ptr3 = ((AttrApp *)be_app)->res_strings->String(STRING_OK);
+			
+			alert = new BAlert("alert", allocd_string, string_ptr1, string_ptr2, string_ptr3, B_WIDTH_FROM_WIDEST, B_OFFSET_SPACING, B_WARNING_ALERT);
+			alert->SetShortcut(0,B_ESCAPE);
+			alert->Go(new BInvoker(new BMessage(SAVE_BEFORE_QUITTING), this));
+			
+			free(allocd_string);
+			return false;
+		}
+	}
+	
 	Unregister();
-	//save_container->PrintToStream();
-	//attribute_container->PrintToStream();
-	//delete save_container;
-	//delete attribute_container;
-	//satillite->PostMessage(B_QUIT_REQUESTED);
 	return BWindow::QuitRequested();
 }
 
@@ -144,8 +172,7 @@ void AttrWindow::MessageReceived(BMessage *msg)
 			// msg feilds are "name", "type", "addon?", "addon id", "win id"
 			const char *name, *type;
 			int32 win_id, addon_id;
-			bool has_addon, replace;
-			ColumnListView *list_view = static_cast<ColumnListView *>(FindView("Attribute List"));
+			bool has_addon;
 			
 			//msg->PrintToStream();
 			if(msg->FindString("name", &name) == B_NO_ERROR)
@@ -155,27 +182,45 @@ void AttrWindow::MessageReceived(BMessage *msg)
 							if(msg->FindInt32("win id", &win_id) == B_NO_ERROR)
 								if(win_id != _id_) // can't drag to self!
 								{
-									BMessage command(DUPLICATE_ATTRIBUTE), result;
+									BMessage command(DUPLICATE_ATTRIBUTE);
 									command.AddInt32("dest win id", _id_); // my window id
 									command.AddInt32("src win id", win_id); // their window id
+									command.AddInt32("addon id", addon_id);
+									command.AddString("type", type);
 									command.AddString("attr name", name);
-									AttributeMessenger->SendMessage(&command, &result); // let the attribute manager take care of it
-									// fail if this is a duplicate attribute or attr with duplicate name
-									// ignore silly casting on the next line. gcc can kiss my ass
-									if(result.what == ANSWER_YES)
-									{
-										if(result.FindBool("existed", &replace) == B_NO_ERROR)
-											if(replace)
-											{
-												//printf("replacing attr: %s\n", name);
-												RemoveListItem(name, list_view);
-												//printf("attr: %s all removed.\n", name);
-											}
-										list_view->AddItem(new AttrItem( name, type, (bool)has_addon, (image_id)addon_id));
-										list_view->Select(list_view->IndexOf(list_view->LastItem())); // keeps edit
-									}
+									command.AddBool("addon?", has_addon);
+									command.AddBool("overwrite", false);
+									AttributeMessenger->SendMessage(&command); // let the attribute manager take care of it
+									// we will get a message telling us to add an attribute to the list
 								}
 							
+			break;
+		}
+		case DRAGGED_ATTRIBUTE_LISTADD:
+		{
+			// msg contains:
+			// "existed" - bool - 'true' means that the dragged attribute replaced an attribute of the same name.
+			// remove the old attribute from the list and add the new one
+			const char *name, *type;
+			bool replace = false, has_addon;
+			int32 addon_id;
+			ColumnListView *list_view = static_cast<ColumnListView *>(FindView("Attribute List"));
+			
+			if(msg->FindString("attr name", &name) == B_NO_ERROR)
+				if(msg->FindString("type", &type) == B_NO_ERROR)
+					if(msg->FindBool("addon?", &has_addon) == B_NO_ERROR)
+						if(msg->FindInt32("addon id", &addon_id) == B_NO_ERROR)
+							if(msg->FindBool("overwrite", &replace) == B_NO_ERROR)
+							{
+								if(replace)
+								{
+									//printf("replacing attr: %s\n", name);
+									RemoveListItem(name, list_view);
+									//printf("attr: %s all removed.\n", name);
+								}
+								list_view->AddItem(new AttrItem( name, type, (bool)has_addon, (image_id)addon_id));
+								list_view->Select(list_view->IndexOf(list_view->LastItem())); // keeps edit window happy
+							}
 			break;
 		}
 		case MAKE_NEW_ATTRIBUTE:
@@ -237,6 +282,36 @@ void AttrWindow::MessageReceived(BMessage *msg)
 			be_app->PostMessage(save_msg);
 			//printf("deleteing save_msg.\n");
 			delete save_msg;
+			break;
+		}
+		case SAVE_BEFORE_QUITTING:
+		{
+			// msg contains:
+			// "which" - int32 indicating which button was pressed on Save Alert.
+			// 0 = don't save, 1 = cancel, 2 = OK
+			int32 which;
+			
+			if(msg->FindInt32("which", &which) == B_NO_ERROR)
+			{
+				if(which == 0)
+				{
+					break;
+				}
+				if(which == 1)
+				{	
+					ok_to_quit = true;
+					PostMessage(B_QUIT_REQUESTED);
+					break;
+				}
+				// else ...
+				BMessage *save_msg = new BMessage(SAVE_FILE);
+			
+				save_msg->AddInt32("win id", _id_);
+				be_app->PostMessage(save_msg);
+				delete save_msg;
+				
+				//PostMessage(B_QUIT_REQUESTED); // then quit
+			}
 			break;
 		}
 		case B_SIMPLE_DATA:
@@ -334,7 +409,7 @@ int32 AttrWindow::BuildMenubar(int32 width, int32 height)
 	
 	SetKeyMenuBar(menubar);
 	AddChild(menubar); // if we add it to the window, we can use it to size our view
-	return(menubar->Bounds().Height() + 1);
+	return((int32)(menubar->Bounds().Height() + 1));
 }
 
 void AttrWindow::Config(ColumnListView *list_view, BMessage *msg)
@@ -501,7 +576,7 @@ void AttrWindow::FileTypeChanged(const char *new_type)
 	BMenu *sub_menu;
 	BMenuItem *remove_item;
 	const char *attr_name, *pub_attr_name;
-	char short_description[B_MIME_TYPE_LENGTH+1]; // BeBook told me it wouldn't be any longer
+	char *initial_attr_data = (char *)malloc(1);
 	int32 attr_type, index=0;
 	
 	//attr_info.PrintToStream();
@@ -520,17 +595,23 @@ void AttrWindow::FileTypeChanged(const char *new_type)
 	if(attr_info.IsEmpty())
 		return;
 	
+	memset((void *)initial_attr_data,0,1);
 	while(attr_info.FindString("attr:public_name", index, &pub_attr_name) == B_OK)
 	{
 		menu_item_msg = new BMessage(ADD_NEW_ATTRIBUTE);
 		attr_info.FindString("attr:name", index, &attr_name);
 		attr_info.FindInt32("attr:type", index, &attr_type);
+		menu_item_msg->AddInt32("win id", _id_);
 		menu_item_msg->AddString("attr name", attr_name);
 		menu_item_msg->AddInt32("type", attr_type);
+		menu_item_msg->AddData("attribute", attr_type, (void *)initial_attr_data, 1);
 		sub_menu->AddItem(new BMenuItem(pub_attr_name, menu_item_msg));
 		menu_item_msg = NULL;
 		index++;
 	}
+	free(initial_attr_data);
+	
+	sub_menu->SetTargetForItems(*AttributeMessenger);
 }
 
 void AttrWindow::EditItem(const char *name, image_id addon_id)

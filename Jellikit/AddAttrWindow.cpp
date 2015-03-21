@@ -308,7 +308,6 @@ void AddAttrWindow::MessageReceived(BMessage *msg)
 void AddAttrWindow::BuildMimeMenu()
 {
 	BMenu *sub_menu;
-	BRect rect;
 	BMimeType a_type;
 	BMessage super_types, types, attr_info, *menu_item_msg;
 	int32 i=0,j=0;

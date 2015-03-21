@@ -32,15 +32,17 @@ AppResStrings::AppResStrings()
 		"rect",
 		"bool",
 		"raw",
-		"An attribute with the same name already exists\nfor this file. Would you like to replace it\nwith the one you are moving?\n\n",
+		"An attribute with the same name already exists for this file. Would you like to replace it with the one you are moving?",
 		"Version",
-		"The %s manager failed to initialize correctly.\nThat pretty much makes this program non-functional.\nI will quit now.",
+		"The %s manager failed to initialize correctly. That pretty much makes this program non-functional. I will quit now.",
 		"Attribute",
 		"add-on",
 		"Name",
 		"mime string",
 		"Predefined",
 		"other",
+		"Save changes to \'%s?\'",
+		"Don't Save",
 		NULL
 	};
 	

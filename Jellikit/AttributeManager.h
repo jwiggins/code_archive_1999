@@ -11,7 +11,9 @@
 // app kit
 #include <Looper.h>
 #include <Message.h>
+#include <Invoker.h>
 // interface kit
+#include <Alert.h>
 // support kit
 #include <List.h>
 #include <SupportDefs.h>
@@ -34,6 +36,7 @@ struct file_list_entry {
 	char *filename; // what filename are these attributes for?
 	BMessage *attributes; // what are the attributes?
 	BMessage *remove_list; // which attrs, if any, need to be removed?
+	bool file_is_dirty;
 };
 
 class AttributeManager : public BLooper {

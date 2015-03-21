@@ -20,7 +20,7 @@ ELLIPSIS='…'
 xres -o $COPY_RESFILE -d CSTR $EXECUTABLE
 
 #erase all the executable's resources (all the type ignores are a bit kludgy)
-xres -d CSTR -d RAWT -d MSGG -d MIMS -d APPV -d APPF -o $EXECUTABLE $EXECUTABLE
+xres -d CSTR -d RAWT -d MSGG -d MIMS -d APPV -d APPF -d ICON -d MICN -o $EXECUTABLE $EXECUTABLE
 
 # dump a wad of strings into new resource file
 $XRES -a CSTR:0 -s "OK"
@@ -34,26 +34,27 @@ $XRES -a CSTR:7 -s 'Save As'$ELLIPSIS $RESFILE
 $XRES -a CSTR:8 -s "About" $RESFILE
 $XRES -a CSTR:9 -s "Quit" $RESFILE
 $XRES -a CSTR:10 -s "Edit" $RESFILE
-$XRES -a CSTR:11 -s "Add Attribute" $RESFILE
-$XRES -a CSTR:12 -s "Remove Attribute" $RESFILE
+$XRES -a CSTR:11 -s "Add" $RESFILE
+$XRES -a CSTR:12 -s "Remove" $RESFILE
 $XRES -a CSTR:13 -s "Untitled" $RESFILE
-$XRES -a CSTR:14 -s "Attribute Name" $RESFILE
-$XRES -a CSTR:15 -s "Type" $RESFILE
-$XRES -a CSTR:16 -s "string" $RESFILE
-$XRES -a CSTR:17 -s "int64" $RESFILE
-$XRES -a CSTR:18 -s "int32" $RESFILE
-$XRES -a CSTR:19 -s "double" $RESFILE
-$XRES -a CSTR:20 -s "float" $RESFILE
-$XRES -a CSTR:21 -s "rect" $RESFILE
-$XRES -a CSTR:22 -s "bool" $RESFILE
-$XRES -a CSTR:23 -s "raw" $RESFILE
-$XRES -a CSTR:24 -s "An attribute with the same name already exists for this file. Would you like to replace it with the one you are moving?" $RESFILE
-$XRES -a CSTR:25 -s "Version"  $RESFILE
-$XRES -a CSTR:26 -s "The %s manager failed to initialize correctly. That pretty much makes this program non-functional. I will quit now."  $RESFILE
-$XRES -a CSTR:27 -s "attribute" $RESFILE
-$XRES -a CSTR:28 -s "add-on"  $RESFILE
-$XRES -a CSTR:29 -s "Name"  $RESFILE
-$XRES -a CSTR:30 -s "mime string"  $RESFILE
+$XRES -a CSTR:14 -s "Type" $RESFILE
+$XRES -a CSTR:15 -s "string" $RESFILE
+$XRES -a CSTR:16 -s "int64" $RESFILE
+$XRES -a CSTR:17 -s "int32" $RESFILE
+$XRES -a CSTR:18 -s "double" $RESFILE
+$XRES -a CSTR:19 -s "float" $RESFILE
+$XRES -a CSTR:20 -s "rect" $RESFILE
+$XRES -a CSTR:21 -s "bool" $RESFILE
+$XRES -a CSTR:22 -s "raw" $RESFILE
+$XRES -a CSTR:23 -s "An attribute with the same name already exists for this file. Would you like to replace it with the one you are moving?" $RESFILE
+$XRES -a CSTR:24 -s "Version"  $RESFILE
+$XRES -a CSTR:25 -s "The %s manager failed to initialize correctly. That pretty much makes this program non-functional. I will quit now."  $RESFILE
+$XRES -a CSTR:26 -s "Attribute" $RESFILE
+$XRES -a CSTR:27 -s "add-on"  $RESFILE
+$XRES -a CSTR:28 -s "Name"  $RESFILE
+$XRES -a CSTR:29 -s "mime string"  $RESFILE
+$XRES -a CSTR:30 -s "Predefined"  $RESFILE
+$XRES -a CSTR:31 -s "other"  $RESFILE
 
 # dump string resource file and old resources into executable file
 xres -o $EXECUTABLE $RESFILE $COPY_RESFILE

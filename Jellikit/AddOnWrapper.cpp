@@ -1,6 +1,6 @@
 /*
 
-	AddOnWrapper.cpp
+	AddOnWrapper.cpp - a nicer interface to add-ons
 	John Wiggins 1998
 
 */
@@ -8,27 +8,18 @@
 #include "AddOnWrapper.h"
 
 AddOnWrapper::AddOnWrapper(image_id id)
-			:initialized(false), addon_id(id)
-{	
-	//if(get_image_symbol(id, "Instantiate", B_SYMBOL_TYPE_TEXT, (void **)&_Instantiate))
-	//{
-	//	printf( "get_image_symbol( Instantiate ) failed\n" );
-	//	unload_add_on(id);
-	//}
-	//else
-	//{
-		
-		if(get_image_symbol(id, "TypeCode", B_SYMBOL_TYPE_DATA, (void **)&_TypeCode))
-		{
-			printf( "get_image_symbol( TypeCode ) failed\n" );
-			unload_add_on(id);
-		}
-		else
-		{
-			// woohoo. 
-			initialized = true;
-		}
-	//}
+			:addon_id(id), initialized(false)
+{
+	if(get_image_symbol(id, "TypeCode", B_SYMBOL_TYPE_DATA, (void **)&_TypeCode))
+	{
+		//printf( "get_image_symbol( TypeCode ) failed\n" );
+		unload_add_on(id);
+	}
+	else
+	{
+		// woohoo. 
+		initialized = true;
+	}
 }
 
 AddOnWrapper::~AddOnWrapper()

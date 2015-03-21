@@ -1,6 +1,6 @@
 #ifndef JELLIKIT_VERSION_H
 #define JELLIKIT_VERSION_H
 
-#define JELLIKIT_VERSION "0.9b3"
+#define JELLIKIT_VERSION "0.9b5"
 
 #endif

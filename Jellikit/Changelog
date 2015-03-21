@@ -1,5 +1,12 @@
 Jellikit Changelog
 
+0.9 beta 5
+- Made all Alerts asynchronous. No more blocked windows that can't redraw themselves.
+- Added an alert that asks you if you want to save when closing if the file has changed. (took me long enough eh?)
+- The little icon that drag-and-drop uses can be changed by changing the app's icon. Try it, its fun.
+- Added a couple more strings to the ChangeLanguageToEnglish.sh script. Be warned if you have a translated version that I don't know about.
+- Wrote a document decribing the current state of the add-on API (still no 3rd party add-ons)
+
 0.9 beta 4
 - Gave Jellikit a Tracker icon. I hope you like it!
 - Added better representation of dragged attributes. No more grey rectagles!

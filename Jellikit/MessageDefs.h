@@ -30,10 +30,12 @@ enum
 	ERR_ALREADY_EXISTS =		'errx',
 	
 	IS_FILE_OPEN =				'isop',
+	IS_FILE_DIRTY =				'drty',
 	NEW_FILE = 					'newf',
 	OPEN_FILE =					'open',
 	SAVE_FILE =					'save',
 	SAVE_AS_FILE =				'svas',
+	SAVE_BEFORE_QUITTING =		'sbfq',
 	ADD_FILE_TO_LIST =			'aftl',
 	GET_PATH_FOR_FILE =			'gpff',
 	SET_PATH_FOR_FILE =			'spff',
@@ -46,6 +48,7 @@ enum
 	DUPLICATE_ATTRIBUTE =		'dupa',
 	APPLY_ATTRIBUTE_EDIT =		'apae',
 	DRAGGED_ATTRIBUTE =			'drga',
+	DRAGGED_ATTRIBUTE_LISTADD =	'dala',
 	GET_ATTRIBUTES =			'gats',
 	
 	WINDOW_REGISTRY_ADD =		'wrad',

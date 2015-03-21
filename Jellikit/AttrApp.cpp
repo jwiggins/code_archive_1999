@@ -1,6 +1,6 @@
 /*
 	
-	AttrApp.cpp - generic attribute editor
+	AttrApp.cpp - an extensible attribute editor
 	John Wiggins 1998
 	
 */
@@ -20,7 +20,7 @@ int main(void)
 ///////////////////
 
 AttrApp::AttrApp()
-		: BApplication(APP_SIGNATURE), window_count(0), next_untitled_number(1), window_id_source(0), about_box_alive(false)
+		: BApplication(APP_SIGNATURE), window_count(0), window_id_source(0), next_untitled_number(1), about_box_alive(false)
 {
 	status_t err;
 	const char *string_ptr1, *string_ptr2, *string_ptr3;
@@ -108,7 +108,7 @@ bool AttrApp::QuitRequested()
 	delete SaveAsPanel;
 	
 	// tell all the windows to die
-	while(window = WindowAt(i++))
+	while((window = WindowAt(i++)) != NULL)
 	{
 		//window->Quit();
 		window->PostMessage(B_QUIT_REQUESTED);
@@ -413,7 +413,6 @@ void AttrApp::MessageReceived(BMessage *msg)
 			BMessage reply, query;
 			const char *pathname;
 			status_t err;
-			int i;
 			
 			query = *msg; // make a copy
 			query.what = GET_PATH_FOR_FILE;
@@ -479,7 +478,8 @@ void AttrApp::MessageReceived(BMessage *msg)
 status_t AttrApp::Save(BMessage *msg)
 {
 	// msg contains "filename" and "attrmsg"
-	char *filename, *name; // the name of the file
+	const char *filename; // name of the file
+	char *name; // the name of an attribute
 	const void *ptr;
 	BMessage *attrmsg, *remove_list, query_msg(GET_ATTRIBUTES), reply;
 	BMessenger messenger(the_attr_manager);

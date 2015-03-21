@@ -13,6 +13,9 @@
 #include <Bitmap.h>
 #include <ScrollView.h>
 #include <List.h>
+#include <AppFileInfo.h>
+#include <File.h>
+#include <math.h>
 
 #include "Colors.h"
 #include "CLVColumn.h"
@@ -130,6 +133,7 @@ class ColumnListView : public BListView
 		BList fFullItemList;
 		
 		// my stuff
+		BBitmap *icon_bitmap;
 		bool mouse_is_down, currently_dragging;
 		BPoint mouse_down_point;
 };

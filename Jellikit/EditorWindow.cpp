@@ -52,7 +52,7 @@ EditorWindow::EditorWindow(BRect frame)
 	background->AddChild(stub);
 	
 	current_view = stub;
-	current_attr_type = -1;
+	current_attr_type = 0x7fffffff;
 	current_attr_name = NULL;
 	// current_window_id is the id of the AttrWindow that last became the active window
 	current_window_id = -1; // there are no AttrWindows when our ctor is called
@@ -102,7 +102,7 @@ void EditorWindow::MessageReceived(BMessage *msg)
 				list_item->ok_button_state = false;
 				list_item->view = stub;
 				list_item->attr_name = NULL;
-				list_item->attr_type = -1;
+				list_item->attr_type = 0x7fffffff;
 				window_list->AddItem((void *)list_item);
 			}
 			break;
@@ -135,7 +135,7 @@ void EditorWindow::MessageReceived(BMessage *msg)
 					
 					// finish up 
 					current_view = stub;
-					current_attr_type = -1;
+					current_attr_type = 0x7fffffff;
 					current_attr_name = NULL;
 					current_window_id = -1;
 					ChangeWindowTitle();
@@ -189,11 +189,11 @@ void EditorWindow::MessageReceived(BMessage *msg)
 						stub->Show();
 					delete [] list_item->attr_name;
 					list_item->attr_name = NULL;
-					list_item->attr_type = -1;
+					list_item->attr_type = 0x7fffffff;
 				}
 			
 			current_view = stub;
-			current_attr_type = -1;
+			current_attr_type = 0x7fffffff;
 			current_attr_name = NULL;
 			ChangeWindowTitle(); // make the window title reflect the current attribute ( or lack thereof )
 			break;
@@ -340,10 +340,10 @@ void EditorWindow::SwapEditView(BMessage *msg)
 											current_view = stub;
 											while(current_view->IsHidden())
 												current_view->Show();
-											list_item->attr_type = -1;
+											list_item->attr_type = 0x7fffffff;
 											list_item->ok_button_state = false;
 											current_attr_name = NULL;
-											current_attr_type = -1;
+											current_attr_type = 0x7fffffff;
 										}
 									}
 								}
@@ -367,10 +367,10 @@ void EditorWindow::SwapEditView(BMessage *msg)
 										current_view = stub;
 										while(current_view->IsHidden())
 											current_view->Show();
-										list_item->attr_type = -1;
+										list_item->attr_type = 0x7fffffff;
 										list_item->ok_button_state = false;
 										current_attr_name = NULL;
-										current_attr_type = -1;
+										current_attr_type = 0x7fffffff;
 									}
 								}
 							} // ret == B_NO_ERROR
@@ -383,10 +383,10 @@ void EditorWindow::SwapEditView(BMessage *msg)
 								current_view = stub;
 								while(current_view->IsHidden())
 									current_view->Show();
-								list_item->attr_type = -1;
+								list_item->attr_type = 0x7fffffff;
 								list_item->ok_button_state = false;
 								current_attr_name = NULL;
-								current_attr_type = -1;
+								current_attr_type = 0x7fffffff;
 							}
 							// put this all in on place after the chaos above for code tidyness (heh)
 							ChangeWindowTitle();
@@ -401,7 +401,7 @@ void EditorWindow::SwapEditView(BMessage *msg)
 						while(current_view->IsHidden())
 							current_view->Show();
 						current_attr_name = NULL;
-						current_attr_type = -1;
+						current_attr_type = 0x7fffffff;
 						ChangeWindowTitle();
 					}
 					// end of actual guts
@@ -473,7 +473,7 @@ void EditorWindow::AttrWindowActivated(int32 window_id)
 			while(current_view->IsHidden())
 				current_view->Show(); // show the new view (stub in this case)
 			current_attr_name = NULL;
-			current_attr_type = -1;
+			current_attr_type = 0x7fffffff;
 			ChangeWindowTitle(); // make the window title reflect the current attribute
 		}
 		else // current_window_id points to a just dead window (probably). set up the new window's stuff
@@ -520,7 +520,7 @@ window_list_entry *EditorWindow::GetListItem(int32 window_id)
 	window_list_entry *list_item;
 	int32 i=0;
 	
-	while(list_item = (window_list_entry *)window_list->ItemAt(i++))
+	while((list_item = (window_list_entry *)window_list->ItemAt(i++)) != NULL)
 		if(list_item->window_id == window_id)
 			return list_item;
 	

@@ -28,7 +28,7 @@ void CLVListItem::DrawItem(BView* owner, BRect itemRect, bool complete)
 {
 	BList* DisplayList = &((ColumnListView*)owner)->fColumnDisplayList;
 	int32 NumberOfColumns = DisplayList->CountItems();
-	float PushMax = itemRect.right;
+	//float PushMax = itemRect.right;
 	CLVColumn* ThisColumn;
 	BRect ThisColumnRect = itemRect;
 	

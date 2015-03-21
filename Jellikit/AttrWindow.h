@@ -64,6 +64,7 @@ int32				_id_;
 EditorWindow		*edit_win; // the window where the editing happens
 AddAttrWindow		*add_attr_win; // a miniature attribute factory
 BMessenger			*AddonMessenger, *AttributeMessenger;
+bool				ok_to_quit;
 };
 
 

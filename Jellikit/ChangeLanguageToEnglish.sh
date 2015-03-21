@@ -27,10 +27,10 @@ $XRES -a CSTR:0 -s "OK"
 $XRES -a CSTR:1 -s "Cancel" $RESFILE
 $XRES -a CSTR:2 -s "File" $RESFILE
 $XRES -a CSTR:3 -s "New File" $RESFILE
-$XRES -a CSTR:4 -s 'Open File'$ELLIPSIS $RESFILE
+$XRES -a CSTR:4 -s "Open File$ELLIPSIS" $RESFILE
 $XRES -a CSTR:5 -s "Close" $RESFILE
 $XRES -a CSTR:6 -s "Save" $RESFILE
-$XRES -a CSTR:7 -s 'Save As'$ELLIPSIS $RESFILE
+$XRES -a CSTR:7 -s "Save As$ELLIPSIS" $RESFILE
 $XRES -a CSTR:8 -s "About" $RESFILE
 $XRES -a CSTR:9 -s "Quit" $RESFILE
 $XRES -a CSTR:10 -s "Edit" $RESFILE
@@ -55,6 +55,8 @@ $XRES -a CSTR:28 -s "Name"  $RESFILE
 $XRES -a CSTR:29 -s "mime string"  $RESFILE
 $XRES -a CSTR:30 -s "Predefined"  $RESFILE
 $XRES -a CSTR:31 -s "other"  $RESFILE
+$XRES -a CSTR:32 -s "Save changes to '%s'?"  $RESFILE
+$XRES -a CSTR:33 -s "Don't Save"  $RESFILE
 
 # dump string resource file and old resources into executable file
 xres -o $EXECUTABLE $RESFILE $COPY_RESFILE

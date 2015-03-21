@@ -1,3 +1,10 @@
+/*
+
+	AboutView.cpp - A view for an Aboutbox. Nice scroller.
+	John Wiggins 1998-1999
+
+*/
+
 #include "AboutView.h"
 
 AboutView::AboutView(BRect frame)
@@ -122,11 +129,11 @@ void AboutView::Pulse()
 	
 	if(view)
 	{
-		textheight = view->TextHeight(0, view->TextLength());
-		viewheight = view->Bounds().Height();
-		if(view->LeftTop().y < (textheight + 1))
+		textheight = (int32)view->TextHeight(0, view->TextLength());
+		viewheight = view->Bounds().IntegerHeight();
+		if(view->LeftTop().y < (textheight))
 			view->ScrollBy(0,1);
 		else
-			view->ScrollBy(0, -(textheight + viewheight + 1));
+			view->ScrollBy(0, -(textheight + viewheight));
 	}
 }

@@ -1,5 +1,14 @@
 Jellikit Changelog
 
+0.9 beta 4
+- Gave Jellikit a Tracker icon. I hope you like it!
+- Added better representation of dragged attributes. No more grey rectagles!
+- Cleaned up drag-and-drop. The drag session will not begin until you move the mouse after clicking on an attribute.
+- Added 'Predefined Attribute' menus. The one in the 'Add Attribute' window grabs all the predefined attributes out of the mime database on your hard drive. The one in the 'Edit' menu of the main file window looks for a 'BEOS:TYPE' attribute on the file you are editing and fills the menu with attributes associated with that type if they exist in the mime database. This should be useful if you use Trackerbase or you have custom 'People' attributes.
+- Modified the ChangeLanguageToEnglish.sh script. Old versions of this script will not work with 0.9 beta 4. (well, they will, but the results won't be pretty)
+- Fixed a crash experienced when selecting Quit from the file menu rather than closing the last window. Man do I feel silly :)
+- Added more stuff to the About box. It actually contains information now. (and utra nifty scrolling credits!)
+
 0.9 beta 3
 - Made Jellikit language neutral. You can now change all of Jellikit's displayed strings with a shell script.
 - I _think_ I finally killed the weird bugs that reared their ugly heads whenever multiple file were open and switching between those files' windows would make the Edit window do strange things. If you catch any that you can reproduce, by all means mail me at john@ubermensch.net

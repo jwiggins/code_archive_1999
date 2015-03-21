@@ -34,6 +34,8 @@ STRING_NAME, /* "Name" */
 STRING_MIME_STRING, /* "mime string" */
 STRING_PREDEFINED, /* "Predefined" */
 STRING_OTHER, /* "other" */
+STRING_SAVE_BEFORE_CLOSE, /* "Save changes to %s?" */
+STRING_DONT_SAVE, /* "Don't Save" */
 STRING_END /* nothing. STRING_END = the number of resource strings */
 };
 

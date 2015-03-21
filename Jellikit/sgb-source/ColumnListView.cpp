@@ -65,6 +65,17 @@ fFullItemList(32)
 	//Complete the setup
 	UpdateColumnSizesDataRectSizeScrollBars();
 	fColumnLabelView->UpdateDragGroups();
+	
+	// grab the app icon
+	app_info ai; 
+	BFile file;
+	BAppFileInfo file_info;
+	
+	icon_bitmap = new BBitmap(BRect(0,0,15,15), B_COLOR_8_BIT);
+	be_app->GetAppInfo(&ai);
+	file.SetTo(&ai.ref, B_READ_WRITE);
+	file_info.SetTo(&file);
+	file_info.GetIcon(icon_bitmap, B_MINI_ICON);
 }
 
 
@@ -84,6 +95,8 @@ ColumnListView::~ColumnListView()
 		fScrollView->RemoveChild(this);
 		delete fScrollView;
 	}
+	// free the app icon bitmap
+	delete icon_bitmap;
 }
 
 
@@ -114,7 +127,7 @@ void ColumnListView::UpdateColumnSizesDataRectSizeScrollBars()
 	float ColumnBegin;
 	float ColumnEnd = -1.0;
 	fDataWidth = 0.0;
-	bool NextPushedByExpander = false;
+	//bool NextPushedByExpander = false;
 	int32 NumberOfColumns = fColumnDisplayList.CountItems();
 	for(int32 Counter = 0; Counter < NumberOfColumns; Counter++)
 	{
@@ -524,7 +537,7 @@ void ColumnListView::FrameResized(float width, float height)
 	int32 NumberOfItems = CountItems();
 	BFont Font;
 	GetFont(&Font);
-	for(uint32 Counter = 0; Counter < NumberOfItems; Counter++)
+	for(int32 Counter = 0; Counter < NumberOfItems; Counter++)
 		ItemAt(Counter)->Update(this,&Font);
 	BListView::FrameResized(width,height);
 }
@@ -594,15 +607,24 @@ void ColumnListView::MouseUp(BPoint point)
 }
 
 //#include "dbg_head.h"
-#include "drag_icon.h"
+//#include "drag_icon.h"
 void ColumnListView::MouseMoved(BPoint point, uint32 code, const BMessage *msg)
 {
 	//printf("ColumnListView::MouseMoved()\n");
 	if(!mouse_is_down || currently_dragging)
+		return; // bail if we aren't anticipating a drag
+	
+	// check the distance from the mouse_down_point to point
+	// greater than 5 and we start dragging
+	float dx=0,dy=0,dz=0;
+	dx = mouse_down_point.x - point.x;
+	dy = mouse_down_point.y - point.y;
+	dz = sqrt(dx*dx + dy*dy);
+	if(dz < 5.0)
 		return;
 	
 	BMessage drag_msg(DRAGGED_ATTRIBUTE);
-	BBitmap *drag_bitmap, *icon_bitmap;
+	BBitmap *drag_bitmap;
 	BPoint drag_point;
 	BView *a_view;
 	const char *name_ptr;
@@ -611,8 +633,7 @@ void ColumnListView::MouseMoved(BPoint point, uint32 code, const BMessage *msg)
 	AttrItem *selected = static_cast<AttrItem *>(ItemAt(CurrentSelection()));
 	AttrWindow *window = static_cast<AttrWindow *>(Window());
 	
-	icon_bitmap = new BBitmap(BRect(0,0,15,15), B_COLOR_8_BIT);
-	memcpy(icon_bitmap->Bits(), (void *)kIconBits, icon_bitmap->BitsLength()); // "normal" edition
+	//memcpy(icon_bitmap->Bits(), (void *)kIconBits, icon_bitmap->BitsLength()); // "normal" edition
 	//memcpy(icon_bitmap->Bits(), (void *)kDGBheadBits, icon_bitmap->BitsLength()); // "Dominic G" edition
 	
 	if(selected != NULL)
@@ -633,8 +654,9 @@ void ColumnListView::MouseMoved(BPoint point, uint32 code, const BMessage *msg)
 		drag_bitmap = new BBitmap(BRect(0,0,20 + name_width,15), B_COLOR_8_BIT, true);
 		a_view = new BView(BRect(0,0,20 + name_width, 15), "draw view", B_FOLLOW_ALL, 0);
 		//printf("AddChild\n");
-		//a_view->SetViewColor(B_TRANSPARENT_32_BIT);
+		a_view->SetViewColor(B_TRANSPARENT_32_BIT);
 		a_view->SetLowColor(B_TRANSPARENT_32_BIT);
+		a_view->SetHighColor(0,0,0,255);
 		drag_bitmap->AddChild(a_view);
 		//printf("DrawBitmap\n");
 		if(drag_bitmap->Lock())
@@ -642,8 +664,8 @@ void ColumnListView::MouseMoved(BPoint point, uint32 code, const BMessage *msg)
 			a_view->FillRect(a_view->Bounds(), B_SOLID_LOW);
 			a_view->DrawBitmap(icon_bitmap);
 			//printf("DrawString\n");
-			a_view->SetDrawingMode(B_OP_ALPHA);
-			//a_view->SetLowColor(255,255,255,64);
+			a_view->SetViewColor(0,0,0,255);
+			//a_view->SetDrawingMode();
 			a_view->DrawString(name_ptr, BPoint(20, 12));
 			//printf("Sync\n");
 			a_view->Sync();
@@ -654,13 +676,11 @@ void ColumnListView::MouseMoved(BPoint point, uint32 code, const BMessage *msg)
 		{
 			drag_point.x = mouse_down_point.x;
 			drag_point.y = (int32)mouse_down_point.y % ((int32)ItemFrame(CurrentSelection()).Height() + 1);
-			DragMessage(&drag_msg, drag_bitmap, B_OP_ALPHA, drag_point);
-			//DragMessage(&drag_msg, drag_bitmap, B_OP_BLEND, drag_point);
+			//DragMessage(&drag_msg, drag_bitmap, B_OP_ALPHA, drag_point);
+			DragMessage(&drag_msg, drag_bitmap, B_OP_BLEND, drag_point);
 			currently_dragging = true;
 		}
 	}
-	// clean up
-	delete icon_bitmap;
 }
 
 bool ColumnListView::InitiateDrag(BPoint point, int32 index, bool wasSelected)

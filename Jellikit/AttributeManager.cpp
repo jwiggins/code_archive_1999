@@ -1,6 +1,6 @@
 /*
 
-	AttributeManager.cpp
+	AttributeManager.cpp - the brains of the operation
 	John Wiggins 1998
 
 */
@@ -215,38 +215,57 @@ void AttributeManager::MessageReceived(BMessage *msg)
 			int32 src_win_id, dest_win_id, alert_result;
 			const char *attr_name;
 			status_t err = B_ERROR;
-			BMessage reply;
-			bool previous_existed = false;
+			bool overwrite = false;
+			
+			// check for msg repost that will occur whenever an alert is popped up
+			if(msg->FindInt32("which", &alert_result) == B_NO_ERROR)
+			{
+				if(alert_result == 1)
+				{
+					msg->ReplaceBool("overwrite", true);
+				}
+				else
+					return; // if they don't want to overwrite the attribute, then we have no business being here.
+			}
 			
 			if(msg->FindInt32("src win id", &src_win_id) == B_NO_ERROR)
 				if(msg->FindInt32("dest win id", &dest_win_id) == B_NO_ERROR)
 					if(msg->FindString("attr name", &attr_name) == B_NO_ERROR)
-						err = CopyAttrWinToWin(src_win_id, dest_win_id, attr_name, false);
+						if(msg->FindBool("overwrite", &overwrite) == B_NO_ERROR)
+							err = CopyAttrWinToWin(src_win_id, dest_win_id, attr_name, overwrite);
+			if(err == B_ERROR)
+				break; // we want to bail if something bad happened
 			if(err == ERR_ALREADY_EXISTS)
 			{
 				// prompt to see if the user wants to replace
 				const char *string_ptr1, *string_ptr2, *string_ptr3;
+				BAlert *alert;
+				BMessage *invoker_msg;
+				
 				string_ptr1 = ((AttrApp *)be_app)->res_strings->String(STRING_DUPLICATE_ATTR_WARNING);
 				string_ptr2 = ((AttrApp *)be_app)->res_strings->String(STRING_CANCEL);
 				string_ptr3 = ((AttrApp *)be_app)->res_strings->String(STRING_OK);
-				BAlert *alert = new BAlert("alert",string_ptr1,string_ptr2,string_ptr3, NULL, B_WIDTH_AS_USUAL);
+				
+				alert = new BAlert("alert",string_ptr1,string_ptr2,string_ptr3, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 				alert->SetShortcut(0,B_ESCAPE);
-				alert_result = alert->Go();
-				if(alert_result == 1) // they answered "Yes"
-				{
-					reply.what = ANSWER_YES;
-					previous_existed = true;
-					CopyAttrWinToWin(src_win_id, dest_win_id, attr_name, true);
-				}
-				else
-					reply.what = ANSWER_NO;
+				
+				invoker_msg = new BMessage(msg); // we need to make a copy. Bad Things® will happen otherwise.
+				// the invoker owns this message. we don't have to delete it.
+				
+				alert->Go(new BInvoker(invoker_msg, this));
 			}
 			else
-				reply.what = ANSWER_YES;
+			{
+				// success. Tell the window that got the attribute, that it has a new attribute that it
+				// needs to worry about.
+				BMessage *reply = new BMessage(msg);
+				BWindow *window = FindWindowByID(dest_win_id);
 			
-			
-			reply.AddBool("existed", previous_existed); // was an attribute replaced in this drag session?
-			msg->SendReply(&reply);
+				reply->what = DRAGGED_ATTRIBUTE_LISTADD; // was an attribute replaced in this drag session?
+				if(window != NULL)
+					window->PostMessage(reply);
+				delete reply;
+			}
 			break;
 		}
 		case REMOVE_ATTRIBUTE:
@@ -272,6 +291,8 @@ void AttributeManager::MessageReceived(BMessage *msg)
 						if(!list_item->remove_list->HasString(attr_name)) // it's not already on the remove_list
 							list_item->remove_list->AddString(attr_name, attr_name); // add it
 						//list_item->attributes->PrintToStream();
+						
+						list_item->file_is_dirty = true;
 					}
 			break;
 		}
@@ -326,6 +347,8 @@ void AttributeManager::MessageReceived(BMessage *msg)
 					reply.AddPointer("attrmsg", (void *)list_item->attributes);
 					if(list_item->remove_list != NULL)
 						reply.AddPointer("removelist", (void *)list_item->remove_list);
+					
+					list_item->file_is_dirty = false; // this is safe. we only get this msg when the file is saved
 				}
 			msg->SendReply(&reply); // send the reply, empty or not. AttrApp will do the Right Thing ™
 			break;
@@ -349,6 +372,25 @@ void AttributeManager::MessageReceived(BMessage *msg)
 							delete list_item->remove_list;
 						delete list_item;
 					}
+			break;
+		}
+		case IS_FILE_DIRTY:
+		{
+			// msg contains:
+			// "win id" - id of querying window - int32
+			// action:
+			// - find out if the window's file needs saving and respond accordingly
+			int32 win_id;
+			file_list_entry *list_item;
+			
+			if(msg->FindInt32("win id", &win_id) == B_NO_ERROR)
+				if((list_item = GetListItem(win_id)) != NULL)
+				{
+					if(list_item->file_is_dirty)
+						msg->SendReply(ANSWER_YES);
+					else
+						msg->SendReply(ANSWER_NO);
+				}
 			break;
 		}
 		default:
@@ -381,6 +423,7 @@ void AttributeManager::AddFileToList(const char *path, BMessage *container, int3
 	strcpy(new_entry->filename, path);
 	new_entry->attributes = container;
 	new_entry->remove_list = NULL;
+	new_entry->file_is_dirty = false;
 	
 	file_list->AddItem((void *)new_entry);
 }
@@ -404,7 +447,11 @@ void AttributeManager::ReplaceAttribute(const char *name, const void *attribute,
 	file_list_entry *list_item = NULL;
 	
 	if((list_item = GetListItem(window_id)) != NULL)
+	{
 		list_item->attributes->ReplaceData(name, type, attribute, size);
+		list_item->file_is_dirty = true;
+	}
+		
 }
 
 void AttributeManager::GetPathForFile(int32 window_id, char **pathname)
@@ -462,6 +509,7 @@ status_t AttributeManager::CopyAttrWinToWin(int32 from_win, int32 to_win, const 
 					if(overwrite)
 						list_item->attributes->RemoveName(name); // make sure you trash the old one 
 					err = list_item->attributes->AddData(name, typecode, src_data, data_size, false);
+					list_item->file_is_dirty = true;
 					// check to see if attribute with "name" was previously removed.
 					// if so, take it off the remove list
 					if(list_item->remove_list != NULL)
@@ -493,6 +541,8 @@ status_t AttributeManager::AddNewAttrToWin(const char *name, const void *data, t
 		if(list_item->remove_list != NULL)
 			if(list_item->remove_list->HasString(name))
 				list_item->remove_list->RemoveName(name);
+		
+		list_item->file_is_dirty = true;
 	}
 	
 	return err;
@@ -503,7 +553,7 @@ file_list_entry *AttributeManager::GetListItem(int32 window_id)
 	file_list_entry *list_item;
 	int32 i=0;
 	
-	while(list_item = (file_list_entry *)file_list->ItemAt(i++))
+	while((list_item = (file_list_entry *)file_list->ItemAt(i++)) != NULL)
 		if(list_item->window_id == window_id)
 			return list_item;
 	
@@ -516,7 +566,7 @@ BWindow *AttributeManager::FindWindowByID(int32 window_id)
 	AttrWindow *attrwin = NULL;
 	int32 i=0;
 	
-	while((window = be_app->WindowAt(i++)))
+	while((window = be_app->WindowAt(i++)) != NULL)
 		if(window->Lock())
 		{
 			// do a cast so we don't call ID() for some window that doesn't have it (bad thing ™)
