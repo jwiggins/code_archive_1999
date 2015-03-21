@@ -23,7 +23,7 @@ AttributeManager::AttributeManager(EditorWindow *window)
 AttributeManager::~AttributeManager()
 {
 	void *list_item;
-	for(int32 i=0;(list_item = file_list->ItemAt(i));i++)
+	for(int32 i=0;(list_item = file_list->ItemAt(i)) != NULL;i++)
 	{
 		delete [] ((file_list_entry *)list_item)->filename;
 		delete ((file_list_entry *)list_item)->attributes;
@@ -406,7 +406,7 @@ bool AttributeManager::IsFileOpen(const char *path)
 	file_list_entry *list_item;
 	
 	// sequential search. sue me. :P
-	while(!found && (list_item = (file_list_entry *)file_list->ItemAt(i++)))
+	while(!found && ((list_item = (file_list_entry *)file_list->ItemAt(i++)) != NULL))
 		if(strcmp(path, list_item->filename) == 0)
 			found = true;
 	

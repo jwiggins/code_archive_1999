@@ -71,7 +71,7 @@ AddonManager::AddonManager()
 AddonManager::~AddonManager()
 {
 	void *anItem;
-	for(int32 i=0; (anItem = addon_list->ItemAt(i)); i++)
+	for(int32 i=0; (anItem = addon_list->ItemAt(i)) != NULL; i++)
 		delete anItem;
 	delete addon_list;
 }

@@ -576,7 +576,7 @@ BWindow * AttrApp::FindWindow(const char *title)
 {
 	BWindow *win = NULL;
 	int32 i = 0;
-	while((win = WindowAt(i++)))
+	while((win = WindowAt(i++)) != NULL)
 	{
 		if(win->Lock())
 		{
@@ -602,7 +602,7 @@ BWindow *AttrApp::FindWindowByID(int32 window_id)
 	AttrWindow *attrwin = NULL;
 	int32 i=0;
 	
-	while((window = be_app->WindowAt(i++)))
+	while((window = be_app->WindowAt(i++)) != NULL)
 		if(window->Lock())
 		{
 			// do a cast so we don't call ID() for some window that doesn't have it (bad thing ™)

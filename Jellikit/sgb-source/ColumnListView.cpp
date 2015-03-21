@@ -41,7 +41,7 @@ CLVContainerView::~CLVContainerView()
 
 
 ColumnListView::ColumnListView(BRect Frame, BScrollView **ContainerView, const char *Name,
-	uint32 ResizingMode, uint32 flags, list_view_type Type, bool hierarchical, bool horizontal,
+	uint32 ResizingMode, uint32 flags, list_view_type Type, bool _UNUSED(hierarchical), bool horizontal,
 	bool vertical, border_style border, const BFont *LabelFont)
 : BListView(Frame,Name,Type,B_FOLLOW_ALL_SIDES,flags),
 fColumnList(6),
@@ -599,7 +599,7 @@ void ColumnListView::MouseDown(BPoint point)
 	mouse_is_down = true;
 }
 
-void ColumnListView::MouseUp(BPoint point)
+void ColumnListView::MouseUp(BPoint _UNUSED(point))
 {
 	//printf("ColumnListView::MouseUp()\n");
 	mouse_is_down = false;
@@ -608,11 +608,11 @@ void ColumnListView::MouseUp(BPoint point)
 
 //#include "dbg_head.h"
 //#include "drag_icon.h"
-void ColumnListView::MouseMoved(BPoint point, uint32 code, const BMessage *msg)
+void ColumnListView::MouseMoved(BPoint point, uint32 _UNUSED(code), const BMessage *_UNUSED(msg))
 {
 	//printf("ColumnListView::MouseMoved()\n");
 	if(!mouse_is_down || currently_dragging)
-		return; // bail if we aren't anticipating a drag
+		return; // bail if the mouse isn't down, or we are already dragging
 	
 	// check the distance from the mouse_down_point to point
 	// greater than 5 and we start dragging
@@ -654,19 +654,27 @@ void ColumnListView::MouseMoved(BPoint point, uint32 code, const BMessage *msg)
 		drag_bitmap = new BBitmap(BRect(0,0,20 + name_width,15), B_COLOR_8_BIT, true);
 		a_view = new BView(BRect(0,0,20 + name_width, 15), "draw view", B_FOLLOW_ALL, 0);
 		//printf("AddChild\n");
-		a_view->SetViewColor(B_TRANSPARENT_32_BIT);
-		a_view->SetLowColor(B_TRANSPARENT_32_BIT);
-		a_view->SetHighColor(0,0,0,255);
+		//a_view->SetViewColor(B_TRANSPARENT_32_BIT); // background = clear
+		a_view->SetLowColor(B_TRANSPARENT_32_BIT); // low = clear
+		//a_view->SetHighColor(0,0,0,255); // high = black
 		drag_bitmap->AddChild(a_view);
 		//printf("DrawBitmap\n");
 		if(drag_bitmap->Lock())
 		{
-			a_view->FillRect(a_view->Bounds(), B_SOLID_LOW);
-			a_view->DrawBitmap(icon_bitmap);
+			a_view->FillRect(a_view->Bounds(), B_SOLID_LOW); // fill with transparency
+			a_view->SetDrawingMode(B_OP_BLEND);
+			a_view->DrawBitmap(icon_bitmap); // blit the icon bitmap
+			
+			a_view->SetDrawingMode(B_OP_ALPHA);
+			a_view->SetBlendingMode(B_CONSTANT_ALPHA,B_ALPHA_COMPOSITE);
 			//printf("DrawString\n");
-			a_view->SetViewColor(0,0,0,255);
-			//a_view->SetDrawingMode();
+			a_view->SetHighColor(0,0,0,200); // slightly transparent text
+			//a_view->SetViewColor(216,216,216,1); // black background
+			//a_view->SetLowColor(0,0,0,255); // low = black
+			//a_view->ForceFontAliasing(true);
+			//a_view->SetDrawingMode(B_OP_OVER);
 			a_view->DrawString(name_ptr, BPoint(20, 12));
+			
 			//printf("Sync\n");
 			a_view->Sync();
 			drag_bitmap->Unlock();
@@ -676,8 +684,8 @@ void ColumnListView::MouseMoved(BPoint point, uint32 code, const BMessage *msg)
 		{
 			drag_point.x = mouse_down_point.x;
 			drag_point.y = (int32)mouse_down_point.y % ((int32)ItemFrame(CurrentSelection()).Height() + 1);
-			//DragMessage(&drag_msg, drag_bitmap, B_OP_ALPHA, drag_point);
-			DragMessage(&drag_msg, drag_bitmap, B_OP_BLEND, drag_point);
+			DragMessage(&drag_msg, drag_bitmap, B_OP_ALPHA, drag_point);
+			//DragMessage(&drag_msg, drag_bitmap, B_OP_BLEND, drag_point);
 			currently_dragging = true;
 		}
 	}

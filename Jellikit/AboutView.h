@@ -18,7 +18,7 @@ public:
 					AboutView(BRect frame);
 					~AboutView();
 virtual	void		MouseDown(BPoint point);
-virtual	void		Draw(BRect update);
+virtual	void		Draw(BRect);
 virtual	void		Pulse();
 
 private:

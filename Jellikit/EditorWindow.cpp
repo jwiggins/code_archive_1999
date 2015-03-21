@@ -65,7 +65,7 @@ EditorWindow::EditorWindow(BRect frame)
 EditorWindow::~EditorWindow()
 {
 	void *list_item;
-	for(int32 i=0;(list_item = window_list->ItemAt(i));i++)
+	for(int32 i=0;(list_item = window_list->ItemAt(i)) != NULL;i++)
 	{
 		((window_list_entry *)list_item)->view = NULL;
 		delete list_item;

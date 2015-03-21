@@ -13,7 +13,7 @@
 //******************************************************************************************************
 //**** CLVItem CLASS DEFINITION
 //******************************************************************************************************
-CLVListItem::CLVListItem(uint32 level, bool superitem, bool expanded, float minheight)
+CLVListItem::CLVListItem(uint32 level, bool _UNUSED(superitem), bool expanded, float minheight)
 : BListItem(level, expanded)
 {
 	fMinHeight = minheight;

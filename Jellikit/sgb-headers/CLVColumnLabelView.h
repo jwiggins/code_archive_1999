@@ -42,7 +42,7 @@ class CLVColumnLabelView : public BView
 		~CLVColumnLabelView();
 
 		//BView overrides
-		void Draw(BRect UpdateRect);
+		void Draw(BRect);
 		void MouseDown(BPoint Point);
 		void MessageReceived(BMessage *message);
 

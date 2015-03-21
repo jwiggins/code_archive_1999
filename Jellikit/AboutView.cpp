@@ -96,7 +96,7 @@ void AboutView::MouseDown(BPoint point)
 	}
 }
 
-void AboutView::Draw(BRect update)
+void AboutView::Draw(BRect)
 {
 	BFont font;
 	float cached_size;

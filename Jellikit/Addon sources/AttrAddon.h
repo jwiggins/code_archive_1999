@@ -22,9 +22,9 @@ extern "C"
 // empty base class : derive your own and override all functions
 class AttrAddon : public BView {
 	public:
-					AttrAddon(BRect frame, const char *name, uint32 resizeMask, uint32 flags, BMessage *msg, status_t *ret)
-					:BView(frame,name,resizeMask,flags) {};
-virtual				~AttrAddon() {}; // cleanup
+					AttrAddon(BRect frame, const char *name, uint32 resizeMask, uint32 flags, BMessage *, status_t *ret)
+					:BView(frame,name,resizeMask,flags) {*ret = B_ERROR;};
+virtual				~AttrAddon() {;}; // cleanup
 virtual	status_t	GetData(BMessage *msg){return B_ERROR;};
 virtual	status_t	ChangeData(BMessage *msg){return B_ERROR;};
 virtual	bool		IsDirty() const {return false;};

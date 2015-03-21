@@ -41,7 +41,7 @@ CLVColumnLabelView::~CLVColumnLabelView()
 }
 
 
-void CLVColumnLabelView::Draw(BRect UpdateRect)
+void CLVColumnLabelView::Draw(BRect)
 {
 	BRegion ClippingRegion;
 	GetClippingRegion(&ClippingRegion);

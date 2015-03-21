@@ -70,7 +70,7 @@ AppResStrings::AppResStrings()
 AppResStrings::~AppResStrings()
 {
 	void *anItem;
-	for(int32 i=0; (anItem = StringList->ItemAt(i)); i++)
+	for(int32 i=0; (anItem = StringList->ItemAt(i)) != NULL; i++)
 		free(anItem);
 	delete StringList;
 }
