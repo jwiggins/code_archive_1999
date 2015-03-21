@@ -186,7 +186,19 @@ void AttributeManager::MessageReceived(BMessage *msg)
 				if(msg->FindString("attr name", &attr_name) == B_NO_ERROR)
 					if(msg->GetInfo("data", &type) == B_NO_ERROR)
 						if(msg->FindData("data", type, &attribute, &size) == B_NO_ERROR)
-							ReplaceAttribute(attr_name, attribute, type, size, win_id);
+						{
+							ReplaceAttribute(attr_name, attribute, type, size, win_id); // do the normal action
+							
+							// check to see if the attribute is the BEOS:TYPE attribute
+							if((type == B_MIME_STRING_TYPE) && (strcmp(attr_name, "BEOS:TYPE") == 0))
+							{
+								BWindow *window = FindWindowByID(win_id);
+								BMessage type_change_msg(BEOS_TYPE_CHANGE);
+								type_change_msg.AddString("new type", (const char *)attribute);
+								if(window != NULL)
+									window->PostMessage(&type_change_msg);
+							}
+						}
 						
 			break;
 		}

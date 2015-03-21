@@ -53,6 +53,7 @@ int32				BuildMenubar(int32 width, int32 height);
 void				Config(ColumnListView *list_view, BMessage *msg);
 void				AddListItem(const char *name, type_code type, ColumnListView *list_view);
 void				RemoveListItem(const char *name, ColumnListView *list_view);
+void				FileTypeChanged(const char *new_type);
 
 void				Register(bool need_id);
 void				Unregister();

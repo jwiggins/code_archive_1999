@@ -17,6 +17,7 @@ enum
 	
 	NEW_WINDOW =				'nwin',
 	MAKE_FILE_PANELS =			'mkfp',
+	BUILD_MIME_MENU =			'bdmm',
 	DO_EASTER_EGG =				'egg ',
 	ABOUT_BOX_DYING =			'dead',
 	
@@ -24,6 +25,8 @@ enum
 	CLEAR_YOUR_VIEW =			'klar',
 	ATTR_MANAGER_GREET =		'yoyo',
 	TYPE_MENU_CHANGE =			'tmch',
+	MIME_MENU_CHANGE =			'mmnu',
+	BEOS_TYPE_CHANGE =			'btch',
 	ERR_ALREADY_EXISTS =		'errx',
 	
 	IS_FILE_OPEN =				'isop',

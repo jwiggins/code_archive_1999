@@ -5,10 +5,13 @@
 #include <MenuItem.h>
 #include <Window.h>
 #include <Rect.h>
+#include <Font.h>
+#include <stdio.h>
+#include <malloc.h>
 
 enum {
 BUILD_MIME_MENU =		'bdmm',
-MENU_ITEM_CHANGED =		'menu'
+MIME_MENU_CHANGE =		'mmnu'
 };
 
 class MimeWindow : public BWindow {
@@ -20,6 +23,9 @@ virtual	void			MessageReceived(BMessage *msg);
 
 private:
 void					BuildMimeMenu();
+
+BMenu					*menu;
+
 };
 
 MimeWindow::MimeWindow()
@@ -43,12 +49,22 @@ void MimeWindow::MessageReceived(BMessage *msg)
 {
 	switch(msg->what)
 	{
-		case MENU_ITEM_CHANGED:
+		case MIME_MENU_CHANGE:
 		{
-			const char *string_ptr;
+			const char *string_ptr, *string_ptr2;
 			if(msg->FindString("attr:name", &string_ptr) == B_OK)
 			{
 				SetTitle(string_ptr);
+			}
+			if(msg->FindString("attr:public_name", &string_ptr) == B_OK)
+			{
+				if(msg->FindString("short_desc", &string_ptr2) == B_OK)
+				{
+					char *menu_new_name = (char *)malloc(strlen(string_ptr) + strlen(string_ptr2) + 4);
+					sprintf(menu_new_name, "%s : %s", string_ptr2, string_ptr);
+					menu->Superitem()->SetLabel(menu_new_name);
+					free(menu_new_name);
+				}
 			}
 			break;
 		}
@@ -68,7 +84,7 @@ void MimeWindow::MessageReceived(BMessage *msg)
 void MimeWindow::BuildMimeMenu()
 {
 	BMenuField *menu_field;
-	BMenu *menu, *sub_menu;
+	BMenu *sub_menu;
 	//BMenuItem *menu_item;
 	BRect rect;
 	BMimeType a_type;
@@ -77,11 +93,10 @@ void MimeWindow::BuildMimeMenu()
 	const char *string_ptr;
 	
 	menu = new BMenu("menu");
-	menu->SetRadioMode(true);
-	menu->SetLabelFromMarked(true);
 	
 	rect.Set(10, 10, 189, 30);
 	menu_field = new BMenuField(rect, "mimemenu", "MIME menu", menu);
+	menu_field->SetDivider(be_plain_font->StringWidth("MIME menu") + 5.);
 	if(Lock())
 	{
 		AddChild(menu_field);
@@ -98,8 +113,7 @@ void MimeWindow::BuildMimeMenu()
 		while(types.FindString("types", j++, &string_ptr) == B_NO_ERROR)
 		{
 			//printf("%s\n", string_ptr);
-			a_type.SetTo(string_ptr);
-			if(a_type.InitCheck() < B_NO_ERROR)
+			if(a_type.SetTo(string_ptr) < B_NO_ERROR)
 				continue;
 			a_type.GetAttrInfo(&attr_info);
 			
@@ -109,19 +123,26 @@ void MimeWindow::BuildMimeMenu()
 			//attr_info.PrintToStream();
 			
 			const char *attr_name, *pub_attr_name;
+			char short_description[B_MIME_TYPE_LENGTH+1]; // BeBook told me it wouldn't be any longer
 			int32 attr_type, index=0;
 			
-			sub_menu = new BMenu(string_ptr);
-			while(attr_info.FindString("attr:public_name", index++, &pub_attr_name) == B_OK)
+			if(a_type.GetShortDescription(short_description) < B_NO_ERROR)
+				sub_menu = new BMenu(string_ptr);
+			else
+				sub_menu = new BMenu(short_description);
+			
+			while(attr_info.FindString("attr:public_name", index, &pub_attr_name) == B_OK)
 			{
-				menu_item_msg = new BMessage(MENU_ITEM_CHANGED);
-				attr_info.FindString("attr:name", &attr_name);
-				attr_info.FindInt32("attr:type", &attr_type);
+				menu_item_msg = new BMessage(MIME_MENU_CHANGE);
+				attr_info.FindString("attr:name", index, &attr_name);
+				attr_info.FindInt32("attr:type", index, &attr_type);
+				menu_item_msg->AddString("short_desc", short_description); // this
+				menu_item_msg->AddString("attr:public_name", pub_attr_name); // plus this = new menu label
 				menu_item_msg->AddString("attr:name", attr_name);
 				menu_item_msg->AddInt32("attr:type", attr_type);
 				sub_menu->AddItem(new BMenuItem(pub_attr_name, menu_item_msg));
-				sub_menu->SetRadioMode(true);
 				menu_item_msg = NULL;
+				index++;
 			}
 			menu_field->Menu()->AddItem(sub_menu);
 			attr_info.MakeEmpty();

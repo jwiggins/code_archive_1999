@@ -30,7 +30,7 @@ SRCS=	AppResStrings.cpp \
 	
 		
 # specify the resource files to use
-RSRCS= AttrApp_ppc.rsrc
+RSRCS= Jellikit.rsrc
 
 #specify additional libraries to link against
 #	if libName.so or libName.a is the name of the library to link against

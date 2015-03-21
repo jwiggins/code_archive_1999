@@ -15,7 +15,8 @@ AttrWindow::AttrWindow(BRect frame, const char *title, BMessage *config_msg, BLo
 	int32		width = (int32)bounds.Width();
 	BScrollView *LeftScrollView;
 	ColumnListView *listview;
-	const char *string_ptr;
+	const char *string_ptr, *string_ptr2;
+	char *allocd_string;
 	
 	// init the addon manager messenger & attribute manager messenger
 	AddonMessenger = new BMessenger(NULL, addon_manager, NULL);
@@ -42,8 +43,13 @@ AttrWindow::AttrWindow(BRect frame, const char *title, BMessage *config_msg, BLo
 	listview = new ColumnListView(rect,&LeftScrollView,"Attribute List",B_FOLLOW_ALL_SIDES,
 		B_WILL_DRAW|B_FRAME_EVENTS|B_NAVIGABLE,B_SINGLE_SELECTION_LIST,false,true,true,B_NO_BORDER);
 	listview->AddColumn(new CLVColumn(B_EMPTY_STRING,20.0,CLV_LOCK_WITH_RIGHT|CLV_MERGE_WITH_RIGHT,15.0));
-	string_ptr = ((AttrApp *)be_app)->res_strings->String(STRING_ATTRIBUTE_NAME);
-	listview->AddColumn(new CLVColumn(string_ptr,200.0,0,95.0));
+	
+	string_ptr = ((AttrApp *)be_app)->res_strings->String(STRING_ATTRIBUTE);
+	string_ptr2 = ((AttrApp *)be_app)->res_strings->String(STRING_NAME);
+	allocd_string = (char *)malloc(strlen(string_ptr) + strlen(string_ptr2) + 2);
+	sprintf(allocd_string, "%s %s", string_ptr, string_ptr2);
+	listview->AddColumn(new CLVColumn(allocd_string,200.0,0,95.0));
+	free(allocd_string);
 	string_ptr = ((AttrApp *)be_app)->res_strings->String(STRING_TYPE);
 	listview->AddColumn(new CLVColumn(string_ptr,70.0,0,70.0));
 	
@@ -96,6 +102,17 @@ void AttrWindow::MessageReceived(BMessage *msg)
 			
 			if(msg->FindString("title", &title) == B_NO_ERROR)
 				SetTitle(title);
+			break;
+		}
+		case BEOS_TYPE_CHANGE:
+		{
+			// msg contains:
+			// "new type" - string - new mimestring for file
+			const char *new_type;
+			
+			printf("Got BEOS_TYPE_CHANGE msg\n");
+			if(msg->FindString("new type", &new_type) == B_NO_ERROR)
+				FileTypeChanged(new_type);
 			break;
 		}
 		case REMOVE_ATTRIBUTE:
@@ -256,7 +273,8 @@ int32 AttrWindow::BuildMenubar(int32 width, int32 height)
 	BRect		rect(0,0, width, height);
 	BMenuBar	*menubar;
 	BMenu		*menu, *edit_menu;
-	const char	*string_ptr;
+	const char	*string_ptr, *string_ptr2, *string_ptr3;
+	char 		*allocd_string;
 	
 	menubar = new BMenuBar(rect, "menubar");
 	
@@ -288,16 +306,33 @@ int32 AttrWindow::BuildMenubar(int32 width, int32 height)
 	
 	string_ptr = ((AttrApp *)be_app)->res_strings->String(STRING_EDIT);
 	edit_menu = new BMenu(string_ptr);
-	string_ptr = ((AttrApp *)be_app)->res_strings->String(STRING_ADD_ATTRIBUTE);
-	edit_menu->AddItem(new BMenuItem(string_ptr, new BMessage(MAKE_NEW_ATTRIBUTE)));
-	string_ptr = ((AttrApp *)be_app)->res_strings->String(STRING_REMOVE_ATTRIBUTE);
-	edit_menu->AddItem(new BMenuItem(string_ptr, new BMessage(REMOVE_ATTRIBUTE)));
+	
+	string_ptr = ((AttrApp *)be_app)->res_strings->String(STRING_ADD);
+	string_ptr2 = ((AttrApp *)be_app)->res_strings->String(STRING_ATTRIBUTE);
+	allocd_string = (char *)malloc(strlen(string_ptr) + strlen(string_ptr2) + 2);
+	sprintf(allocd_string, "%s %s", string_ptr, string_ptr2);
+	edit_menu->AddItem(new BMenuItem(allocd_string, new BMessage(MAKE_NEW_ATTRIBUTE)));
+	free(allocd_string);
+	
+	string_ptr = ((AttrApp *)be_app)->res_strings->String(STRING_ADD);
+	string_ptr3 = ((AttrApp *)be_app)->res_strings->String(STRING_PREDEFINED);
+	allocd_string = (char *)malloc(strlen(string_ptr) + strlen(string_ptr2) + strlen(string_ptr3) + 3);
+	sprintf(allocd_string, "%s %s %s", string_ptr, string_ptr3, string_ptr2);
+	edit_menu->AddItem(new BMenu(allocd_string));
+	free(allocd_string);
+	
+	string_ptr = ((AttrApp *)be_app)->res_strings->String(STRING_REMOVE);
+	allocd_string = (char *)malloc(strlen(string_ptr) + strlen(string_ptr2) + 2);
+	sprintf(allocd_string, "%s %s", string_ptr, string_ptr2);
+	edit_menu->AddItem(new BMenuItem(allocd_string, new BMessage(REMOVE_ATTRIBUTE)));
+	free(allocd_string);
 	//((BMenuItem *)edit_menu->ItemAt(0))->SetEnabled(false);
 	//((BMenuItem *)edit_menu->ItemAt(1))->SetEnabled(false);
 	
 	menubar->AddItem(menu);
 	menubar->AddItem(edit_menu);
 	
+	SetKeyMenuBar(menubar);
 	AddChild(menubar); // if we add it to the window, we can use it to size our view
 	return(menubar->Bounds().Height() + 1);
 }
@@ -315,7 +350,17 @@ void AttrWindow::Config(ColumnListView *list_view, BMessage *msg)
 	for(index=0; index <= num_entries; index++)
 	{
 		if(msg->GetInfo(B_ANY_TYPE, index, &name_ptr, &type) == B_NO_ERROR)
+		{
 			AddListItem(name_ptr, type, list_view);
+			if((type == B_MIME_STRING_TYPE) && (strcmp(name_ptr, "BEOS:TYPE") == 0))
+			{
+				//printf("Found a \"BEOS:TYPE\" attribute\n");
+				const char *type_name;
+				ssize_t size;
+				if(msg->FindData(name_ptr, type, (const void **)&type_name, &size) == B_NO_ERROR)
+					FileTypeChanged(type_name);
+			}
+		}
 	}
 }
 
@@ -445,6 +490,46 @@ void AttrWindow::RemoveListItem(const char *name, ColumnListView *list_view)
 			delete item;
 			//printf("deleted it\n");
 		}
+	}
+}
+
+void AttrWindow::FileTypeChanged(const char *new_type)
+{
+	//printf("FileTypeChanged() to %s\n", new_type);
+	BMimeType a_type;
+	BMessage attr_info, *menu_item_msg;
+	BMenu *sub_menu;
+	BMenuItem *remove_item;
+	const char *attr_name, *pub_attr_name;
+	char short_description[B_MIME_TYPE_LENGTH+1]; // BeBook told me it wouldn't be any longer
+	int32 attr_type, index=0;
+	
+	//attr_info.PrintToStream();
+
+	// second menu over, second item in that menu
+	sub_menu = KeyMenuBar()->SubmenuAt(1)->SubmenuAt(1);
+	
+	// empty out the current menu
+	while((remove_item = sub_menu->RemoveItem((int32)0)) != NULL)
+		delete remove_item;
+	
+	if(a_type.SetTo(new_type) < B_NO_ERROR)
+		return;
+	a_type.GetAttrInfo(&attr_info);
+	
+	if(attr_info.IsEmpty())
+		return;
+	
+	while(attr_info.FindString("attr:public_name", index, &pub_attr_name) == B_OK)
+	{
+		menu_item_msg = new BMessage(ADD_NEW_ATTRIBUTE);
+		attr_info.FindString("attr:name", index, &attr_name);
+		attr_info.FindInt32("attr:type", index, &attr_type);
+		menu_item_msg->AddString("attr name", attr_name);
+		menu_item_msg->AddInt32("type", attr_type);
+		sub_menu->AddItem(new BMenuItem(pub_attr_name, menu_item_msg));
+		menu_item_msg = NULL;
+		index++;
 	}
 }
 

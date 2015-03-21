@@ -20,10 +20,9 @@ AppResStrings::AppResStrings()
 		"About",
 		"Quit",
 		"Edit",
-		"Add Attribute",
-		"Remove Attribute",
+		"Add",
+		"Remove",
 		"Untitled",
-		"Attribute Name",
 		"Type",
 		"string",
 		"int64",
@@ -36,10 +35,12 @@ AppResStrings::AppResStrings()
 		"An attribute with the same name already exists\nfor this file. Would you like to replace it\nwith the one you are moving?\n\n",
 		"Version",
 		"The %s manager failed to initialize correctly.\nThat pretty much makes this program non-functional.\nI will quit now.",
-		"attribute",
+		"Attribute",
 		"add-on",
 		"Name",
 		"mime string",
+		"Predefined",
+		"other",
 		NULL
 	};
 	

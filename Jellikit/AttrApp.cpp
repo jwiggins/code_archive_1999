@@ -7,7 +7,6 @@
 
 #include "AttrApp.h"
 
-
 int main(void)
 {	
 	AttrApp myApplication;
@@ -25,7 +24,7 @@ AttrApp::AttrApp()
 {
 	status_t err;
 	const char *string_ptr1, *string_ptr2, *string_ptr3;
-	char *error_string;
+	char *allocd_string;
 	// construct the AppResStrings object so we can get our displayable strings
 	res_strings = new AppResStrings();
 	// construct an AddonManager™ for handy addon management
@@ -40,13 +39,13 @@ AttrApp::AttrApp()
 		//printf("got \"add-on\" string. %s\n", string_ptr2);
 		string_ptr3 = res_strings->String(STRING_OK);
 		//printf("got \"ok\" string. %s\n", string_ptr3);
-		error_string = (char *)malloc(strlen(string_ptr1) + strlen(string_ptr2) + 1);
+		allocd_string = (char *)malloc(strlen(string_ptr1) + strlen(string_ptr2) + 1);
 		//printf("allocated error_string\n");
-		sprintf(error_string, string_ptr1, string_ptr2);
-		BAlert *alert = new BAlert("start failure", error_string, string_ptr3);
+		sprintf(allocd_string, string_ptr1, string_ptr2);
+		BAlert *alert = new BAlert("start failure", allocd_string, string_ptr3);
 		alert->Go();
 		PostMessage(B_QUIT_REQUESTED); // safer than Quit() ...
-		free(error_string);
+		free(allocd_string);
 		return;
 	}
 	else
@@ -64,20 +63,24 @@ AttrApp::AttrApp()
 			string_ptr1 = res_strings->String(STRING_NO_MANAGER_WARNING);
 			string_ptr2 = res_strings->String(STRING_ATTRIBUTE);
 			string_ptr3 = res_strings->String(STRING_OK);
-			error_string = (char *)malloc(strlen(string_ptr1) + strlen(string_ptr2) + 1);
-			sprintf(error_string, string_ptr1, string_ptr2);
-			BAlert *alert = new BAlert("start failure", error_string, string_ptr3);
+			allocd_string = (char *)malloc(strlen(string_ptr1) + strlen(string_ptr2) + 1);
+			sprintf(allocd_string, string_ptr1, string_ptr2);
+			BAlert *alert = new BAlert("start failure", allocd_string, string_ptr3);
 			alert->Go();
 			PostMessage(B_QUIT_REQUESTED); // safer than Quit() ...
-			free(error_string);
+			free(allocd_string);
 			return;
 		}
 		else
 		{
 			// construct the "Add Attribute" window
-			rect.Set(150,100, 399,199);
-			string_ptr1 = res_strings->String(STRING_ADD_ATTRIBUTE);
-			the_addattr_window = new AddAttrWindow(rect, string_ptr1, the_addon_manager, the_attr_manager);
+			rect.Set(150,100, 399,219);
+			string_ptr1 = res_strings->String(STRING_ADD);
+			string_ptr2 = res_strings->String(STRING_ATTRIBUTE);
+			allocd_string = (char *)malloc(strlen(string_ptr1) + strlen(string_ptr2) + 2);
+			sprintf(allocd_string, "%s %s", string_ptr1, string_ptr2);
+			the_addattr_window = new AddAttrWindow(rect, allocd_string, the_addon_manager, the_attr_manager);
+			free(allocd_string);
 			// construct the AttrMessenger
 			AttrMessenger = new BMessenger(the_attr_manager);
 		}

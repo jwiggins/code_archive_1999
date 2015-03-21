@@ -13,10 +13,9 @@ STRING_SAVE_AS, /* "Save As" */
 STRING_ABOUT, /* "About" */
 STRING_QUIT, /* "Quit" */
 STRING_EDIT, /* "Edit" */
-STRING_ADD_ATTRIBUTE, /* "Add Attribute" */
-STRING_REMOVE_ATTRIBUTE, /* "Remove Attribute" */
+STRING_ADD, /* "Add" */
+STRING_REMOVE, /* "Remove" */
 STRING_UNTITLED, /* "Untitled" */
-STRING_ATTRIBUTE_NAME, /* "Attribute Name" */
 STRING_TYPE, /* "Type" */
 STRING_STRING, /* "string" */
 STRING_INT64, /* "int64" */
@@ -29,10 +28,12 @@ STRING_RAW, /* "raw" */
 STRING_DUPLICATE_ATTR_WARNING, /* "An attribute with the same name already..." */
 STRING_VERSION, /* "Version" */
 STRING_NO_MANAGER_WARNING, /* "The %s manager failed to initialize correctly..." */
-STRING_ATTRIBUTE, /* "attribute" */
+STRING_ATTRIBUTE, /* "Attribute" */
 STRING_ADDON, /* "add-on" */
 STRING_NAME, /* "Name" */
 STRING_MIME_STRING, /* "mime string" */
+STRING_PREDEFINED, /* "Predefined" */
+STRING_OTHER, /* "other" */
 STRING_END /* nothing. STRING_END = the number of resource strings */
 };
 

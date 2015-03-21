@@ -41,6 +41,9 @@ type_code				current_type;
 size_t					current_size;
 BMessenger				*AddonMessenger;
 BMessenger				*AttributeMessenger;
+void					BuildMimeMenu();
+BMenu					*mime_menu;
+BMenuField				*mime_menu_field;
 
 };
 

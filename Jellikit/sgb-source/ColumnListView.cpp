@@ -581,13 +581,16 @@ void ColumnListView::MouseDown(BPoint point)
 	if(!Window()->IsActive())
 		Window()->Activate();
 }
-#include "iconfile.h"
+#include "dbg_head.h"
 bool ColumnListView::InitiateDrag(BPoint point, int32 index, bool wasSelected)
 {
 	// drag & drop
 	BMessage drag_msg(DRAGGED_ATTRIBUTE);
-	BBitmap *drag_bitmap;
+	BBitmap *drag_bitmap, *icon_bitmap;
 	BPoint drag_point, peek_point;
+	BView *a_view;
+	const char *name_ptr;
+	float name_width=0.;
 	
 	AttrItem *selected = static_cast<AttrItem *>(ItemAt(index));
 	AttrWindow *window = static_cast<AttrWindow *>(Window());
@@ -595,11 +598,8 @@ bool ColumnListView::InitiateDrag(BPoint point, int32 index, bool wasSelected)
 	bigtime_t mouse_pause=0;
 	uint32 buttons;
 	
-	drag_point.x = 32-10; drag_point.y = 22-10;
-	
-	drag_bitmap = new BBitmap(BRect(0,0,31,21), B_COLOR_8_BIT);
-	//drag_bitmap->SetBits((void *)BitmapClip, 32*22, 0, B_COLOR_8_BIT); // "Dr Laura" edition :P
-	memset(drag_bitmap->Bits(), 28, drag_bitmap->BitsLength()); // "no-name" edition
+	icon_bitmap = new BBitmap(BRect(0,0,15,15), B_COLOR_8_BIT);
+	memcpy(icon_bitmap->Bits(), (void *)kDBGheadBits, icon_bitmap->BitsLength()); // "DBGhead" edition
 	
 	if(!wasSelected)
 		Select(index); // select it if it wasn't already selected
@@ -622,14 +622,37 @@ bool ColumnListView::InitiateDrag(BPoint point, int32 index, bool wasSelected)
 				drag_msg.AddBool("addon?", selected->HasAddon());
 				drag_msg.AddInt32("addon id", selected->Id());
 				drag_msg.AddInt32("win id", window->ID());
+				// make the drag bitmap
+				//printf("selected->AttrName\n");
+				name_ptr = selected->AttrName();
+				//printf("StringWidth\n");
+				name_width = be_plain_font->StringWidth(name_ptr);
+				//printf("ctors\n");
+				drag_bitmap = new BBitmap(BRect(0,0,20 + name_width,15), B_COLOR_8_BIT, true);
+				a_view = new BView(BRect(0,0,20 + name_width, 15), "draw view", B_FOLLOW_ALL, 0);
+				//printf("AddChild\n");
+				//a_view->SetViewColor(B_TRANSPARENT_32_BIT);
+				a_view->SetLowColor(B_TRANSPARENT_32_BIT);
+				drag_bitmap->AddChild(a_view);
+				//printf("DrawBitmap\n");
+				drag_bitmap->Lock();
+				a_view->FillRect(a_view->Bounds(), B_SOLID_LOW);
+				a_view->DrawBitmap(icon_bitmap);
+				//printf("DrawString\n");
+				a_view->SetDrawingMode(B_OP_ALPHA);
+				//a_view->SetLowColor(255,255,255,64);
+				a_view->DrawString(name_ptr, BPoint(20, 12));
+				//printf("Sync\n");
+				a_view->Sync();
+				drag_bitmap->Unlock();
+				if(drag_bitmap->RemoveChild(a_view))
+					delete a_view; 
 				// yahoo
 				if(drag_msg.CountNames(B_ANY_TYPE) == 5)
 				{
-					#ifdef B_BEOS_VERSION_4
+					drag_point.x = point.x; drag_point.y = (int32)point.y % ((int32)ItemFrame(index).Height() + 2);
 					DragMessage(&drag_msg, drag_bitmap, B_OP_ALPHA, drag_point);
-					#else
-					DragMessage(&drag_msg, drag_bitmap, B_OP_BLEND, drag_point);
-					#endif
+					//DragMessage(&drag_msg, drag_bitmap, B_OP_BLEND, drag_point);
 					
 					return true;
 				}
