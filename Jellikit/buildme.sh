@@ -23,9 +23,4 @@ make
 mv obj.$CPU/StringAddon ../../add-ons/StringAddon
 cd ../../
 make
-ChangeLanguageToEnglish.sh
-if [ $CPU == "x86" ]
-then
-	stripdebug.sh
-fi
 echo "All done!"

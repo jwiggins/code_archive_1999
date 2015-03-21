@@ -651,24 +651,27 @@ void ColumnListView::MouseMoved(BPoint point, uint32 _UNUSED(code), const BMessa
 		//printf("StringWidth\n");
 		name_width = be_plain_font->StringWidth(name_ptr);
 		//printf("ctors\n");
-		drag_bitmap = new BBitmap(BRect(0,0,20 + name_width,15), B_COLOR_8_BIT, true);
+		drag_bitmap = new BBitmap(BRect(0,0,20 + name_width,15), B_RGB_32_BIT, true);
 		a_view = new BView(BRect(0,0,20 + name_width, 15), "draw view", B_FOLLOW_ALL, 0);
 		//printf("AddChild\n");
 		//a_view->SetViewColor(B_TRANSPARENT_32_BIT); // background = clear
-		a_view->SetLowColor(B_TRANSPARENT_32_BIT); // low = clear
+		
 		//a_view->SetHighColor(0,0,0,255); // high = black
 		drag_bitmap->AddChild(a_view);
 		//printf("DrawBitmap\n");
 		if(drag_bitmap->Lock())
-		{
-			a_view->FillRect(a_view->Bounds(), B_SOLID_LOW); // fill with transparency
-			a_view->SetDrawingMode(B_OP_BLEND);
+		{	
+			a_view->SetHighColor(0, 0, 0, 0); // clear
+			a_view->FillRect(a_view->Bounds()); // fill with transparency
+			
+			// Drawing State magic
+			a_view->SetDrawingMode(B_OP_ALPHA);
+			a_view->SetHighColor(0, 0, 0, 128);
+			a_view->SetBlendingMode(B_CONSTANT_ALPHA,B_ALPHA_COMPOSITE);
+			
 			a_view->DrawBitmap(icon_bitmap); // blit the icon bitmap
 			
-			a_view->SetDrawingMode(B_OP_ALPHA);
-			a_view->SetBlendingMode(B_CONSTANT_ALPHA,B_ALPHA_COMPOSITE);
 			//printf("DrawString\n");
-			a_view->SetHighColor(0,0,0,200); // slightly transparent text
 			//a_view->SetViewColor(216,216,216,1); // black background
 			//a_view->SetLowColor(0,0,0,255); // low = black
 			//a_view->ForceFontAliasing(true);

@@ -23,6 +23,7 @@ bool SketchWindow::QuitRequested()
 	if(format != NULL)
 		delete [] format; // delete your little char *
 	be_app->PostMessage(B_QUIT_REQUESTED);
+	
 	return(TRUE);
 }
 

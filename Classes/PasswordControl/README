@@ -4,6 +4,7 @@ a BTextControl _built_ for passwords.
 The idea around this class is that you shouldnt need to modify your code too much to make a BTextControl in your app do passwords.
 Here's whats different:
 - Text() is not advisable unless you want a bunch of *'s. Use the actualText() function instead
+- SetText() is safe. It will do The Right Thing ™ if you hand it a string (UTF8 too).
 - everything else is called within the class.
 
 Stuff you might need to change:

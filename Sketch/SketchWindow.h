@@ -10,6 +10,8 @@
 #define SKETCH_WINDOW_H
 
 #include <Window.h>
+//#include <stdio.h>
+//#include <OS.h>
 
 // my Message constants
 enum {
