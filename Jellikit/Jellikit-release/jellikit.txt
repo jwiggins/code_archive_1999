@@ -1,5 +1,5 @@
 ===================== 
-         File: Jellikit-ppc-0.9b3.zip
+         File: Jellikit-ppc.zip & Jellikit-x86.zip
        Author: John Wiggins
       Release: 0.9 beta 3
 Compatibility: R4 ppc

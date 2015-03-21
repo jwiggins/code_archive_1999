@@ -122,14 +122,12 @@ status_t IntegerAddon::GetData(BMessage *msg)
 		text = textview->Text();
 		if(text != NULL)
 		{
-			//printf("packaging up attribute. Text in view = %s\n", text);
 			switch(current_type)
 			{
 				case B_INT32_TYPE:
 				{
 					len = 4;
 					int32 val = atol(text);
-					//printf("val = %d\n", val);
 					err = msg->AddData("data", current_type, (void *)&val, len);
 					break;
 				}
@@ -137,7 +135,6 @@ status_t IntegerAddon::GetData(BMessage *msg)
 				{	
 					len = 2;
 					int16 val = atoi(text);
-					//printf("val = %d\n", val);
 					err = msg->AddData("data", current_type, (void *)&val, len);
 					break;
 				}
@@ -145,7 +142,6 @@ status_t IntegerAddon::GetData(BMessage *msg)
 				{
 					len = 1;
 					int8 val = atoi(text);
-					//printf("val = %d\n", val);
 					err = msg->AddData("data", current_type, (void *)&val, len);
 					break;
 				}

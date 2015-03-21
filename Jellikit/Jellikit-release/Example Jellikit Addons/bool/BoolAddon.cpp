@@ -10,7 +10,7 @@ BoolAddon::BoolAddon(BRect frame, const char *name, uint32 resizeMask, uint32 fl
 {
 	//printf("BoolAddon: Instantiate.\n");
 	BFont font(be_plain_font);
-	int32 interfaceUnit = ((int32)font.Size()), width = frame.Width();
+	int32 interfaceUnit = ((int32)font.Size()), width = frame.Width(), height = frame.Height();;
 	
 	// get "typecode", "data", & "datasize" out of the message and use
 	// the data to fill in some stuff
@@ -48,13 +48,25 @@ BoolAddon::BoolAddon(BRect frame, const char *name, uint32 resizeMask, uint32 fl
 	{
 		case B_BOOL_TYPE:
 		{
-			rect.Set(interfaceUnit, interfaceUnit, width - interfaceUnit, interfaceUnit<<1);
-			BCheckBox *checkbox = new BCheckBox(rect, "Bool", "Bool", NULL);
-			((BControl*)checkbox)->SetValue((int32)value); // in case of bool, data is 0 or 1
+			rect.Set(interfaceUnit, interfaceUnit, width - (interfaceUnit<<1), height - (interfaceUnit<<1));
+			BRect textrect = rect;
+			textrect.InsetBy(-1,-1);
 			
+			BTextView *textview = new BTextView(rect, "Bool", textrect, B_FOLLOW_ALL, B_WILL_DRAW/* | B_SCRIBBLE_ON_PRESCHOOLERS*/);
+			BScrollView *scrollview = new BScrollView("scrollview", textview, B_FOLLOW_ALL, 0, false, true);
 			initial_value = value;
-			//printf("BoolAddon : AddChild(checkbox);\n");
-			AddChild(((BView*)checkbox));
+			if(initial_value)
+				textview->SetText("1");
+			else
+				textview->SetText("0");
+			AddChild(scrollview);
+			//rect.Set(interfaceUnit, interfaceUnit, width - interfaceUnit, interfaceUnit<<1);
+//			BCheckBox *checkbox = new BCheckBox(rect, "Bool", "Bool", NULL);
+//			((BControl*)checkbox)->SetValue((int32)value); // in case of bool, data is 0 or 1
+//			
+//			initial_value = value;
+//			//printf("BoolAddon : AddChild(checkbox);\n");
+//			AddChild(((BView*)checkbox));
 			break;
 		}
 		default:
@@ -89,12 +101,18 @@ status_t BoolAddon::GetData(BMessage *msg)
 	{
 		case B_BOOL_TYPE:
 		{
-			BCheckBox *checkbox = (BCheckBox *)FindView("Bool");
+			BTextView *textview = (BTextView *)FindView("Bool");
+			int16 value;
+			bool ret_value;
 	
-			if(checkbox != NULL)
+			if(textview != NULL)
 			{
-				bool value = (bool)((BControl*)checkbox)->Value();
-				err = msg->AddData("data", current_type, (void *)&value, sizeof(bool));
+				value = atoi(textview->Text());
+				if(value)
+					ret_value = true;
+				else
+					ret_value = false;
+				err = msg->AddData("data", current_type, (void *)&ret_value, sizeof(bool));
 			}
 			else
 			{
@@ -119,15 +137,18 @@ status_t BoolAddon::ChangeData(BMessage *msg)
 	{
 		case B_BOOL_TYPE: // almost not worth checking
 		{
-			BCheckBox *checkbox = (BCheckBox *)FindView("Bool");
-			if(checkbox != NULL)
+			BTextView *textview = (BTextView *)FindView("Bool");
+			if(textview != NULL)
 			{
 				char *data;
 				ssize_t size;
 				if((err = msg->FindData("data", current_type, (void**)&data, &size)) == B_NO_ERROR)
 				{
-					((BControl*)checkbox)->SetValue(((int32)*data));
 					initial_value = (bool)*data;
+					if(initial_value)
+						textview->SetText("1");
+					else
+						textview->SetText("0");
 				}
 				//err = B_NO_ERROR;
 			}
@@ -147,10 +168,18 @@ status_t BoolAddon::ChangeData(BMessage *msg)
 }
 bool BoolAddon::IsDirty() const
 {
-	BCheckBox *checkbox = (BCheckBox *)FindView("Bool");
-	if(checkbox != NULL)
+	BTextView *textview = (BTextView *)FindView("Bool");
+	bool cur_value;
+	int16 temp_value;
+	if(textview != NULL)
 	{
-		if(initial_value == ((BControl*)checkbox)->Value())
+		temp_value = atoi(textview->Text());
+		if(temp_value)
+			cur_value = true;
+		else
+			cur_value = false;
+		
+		if(initial_value == cur_value)
 			return false;
 		else
 			return true;

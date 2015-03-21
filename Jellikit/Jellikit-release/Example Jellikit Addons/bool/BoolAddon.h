@@ -4,8 +4,8 @@
 	include every friggin header you can imagine, plus 2 or 3 extra 
 	to appease the GUH-NOO C Compiler.
 */
-#include <CheckBox.h>
-#include <Control.h>
+#include <TextView.h>
+#include <ScrollView.h>
 #include <View.h>
 #include <StringView.h>
 #include <Rect.h>
@@ -17,6 +17,7 @@
 #include <SupportDefs.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "AttrAddon.h"
 

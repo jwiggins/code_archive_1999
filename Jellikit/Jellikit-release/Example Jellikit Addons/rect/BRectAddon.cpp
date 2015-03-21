@@ -130,7 +130,45 @@ status_t BRectAddon::GetData(BMessage *msg)
 	{
 		case B_RECT_TYPE:
 		{
-			err = B_ERROR;
+			BTextControl *textview;
+			union {
+				float vals[4];
+				char ptr[16];
+			};
+			textview = (BTextControl *)FindView("Left");
+			if(textview != NULL)
+				vals[0] = atof(textview->Text());
+			else
+			{
+				err = B_ERROR;
+				break;
+			}
+			textview = (BTextControl *)FindView("Top");
+			if(textview != NULL)
+				vals[1] = atof(textview->Text());
+			else
+			{
+				err = B_ERROR;
+				break;
+			}
+			textview = (BTextControl *)FindView("Right");
+			if(textview != NULL)
+				vals[2] = atof(textview->Text());
+			else
+			{
+				err = B_ERROR;
+				break;
+			}
+			textview = (BTextControl *)FindView("Bottom");
+			if(textview != NULL)
+				vals[3] = atof(textview->Text());
+			else
+			{
+				err = B_ERROR;
+				break;
+			}
+			// all righty. all the fun data is now in ptr[16]
+			err = msg->AddData("data", current_type, (void *)ptr, 16);
 			break;
 		}
 		default:
@@ -150,7 +188,66 @@ status_t BRectAddon::ChangeData(BMessage *msg)
 	{
 		case B_RECT_TYPE:
 		{
-			err = B_ERROR;
+			BTextControl *textview;
+			char string[9];
+			union {
+				float vals[4];
+				char ptr[16];
+			};
+			void *data;
+			ssize_t size;
+			
+			if((err = msg->FindData("data", current_type, &data, &size)) == B_NO_ERROR)
+			{
+				memcpy(ptr, data, 16);
+				the_rect.Set(vals[0],vals[1],vals[2],vals[3]);
+				textview = (BTextControl *)FindView("Left");
+				if(textview != NULL)
+				{
+					sprintf(string, "%8.4f", the_rect.left);
+					textview->SetText(string);
+				}
+				else
+				{
+					err = B_ERROR;
+					break;
+				}
+				textview = (BTextControl *)FindView("Top");
+				if(textview != NULL)
+				{
+					sprintf(string, "%8.4f", the_rect.top);
+					textview->SetText(string);
+				}
+				else
+				{
+					err = B_ERROR;
+					break;
+				}
+				textview = (BTextControl *)FindView("Right");
+				if(textview != NULL)
+				{
+					sprintf(string, "%8.4f", the_rect.right);
+					textview->SetText(string);
+				}
+				else
+				{
+					err = B_ERROR;
+					break;
+				}
+				textview = (BTextControl *)FindView("Bottom");
+				if(textview != NULL)
+				{
+					sprintf(string, "%8.4f", the_rect.bottom);
+					textview->SetText(string);
+				}
+				else
+				{
+					err = B_ERROR;
+					break;
+				}
+			}
+			else
+				err = B_ERROR;
 			break;
 		}
 		default:
