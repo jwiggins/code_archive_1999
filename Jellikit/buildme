@@ -1,0 +1,20 @@
+#!/bin/sh
+
+DIRNAME=$(dirname $0)
+
+cd Addon\ sources/bool/
+make
+mv obj.x86/BoolAddon ../../add-ons/BoolAddon
+cd ../integer/
+make
+mv obj.x86/IntegerAddon ../../add-ons/IntegerAddon
+cd ../rect/
+make
+mv obj.x86/BRectAddon ../../add-ons/BRectAddon
+cd ../string/
+make
+mv obj.x86/StringAddon ../../add-ons/StringAddon
+cd ../../
+make
+ChangeLanguageToEnglish.sh
+echo "All done!"

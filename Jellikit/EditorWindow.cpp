@@ -96,6 +96,7 @@ void EditorWindow::MessageReceived(BMessage *msg)
 			
 			if(msg->FindInt32("win id", &win_id) == B_NO_ERROR)
 			{
+				//printf("Adding new window %ld\n", win_id);
 				list_item = new window_list_entry;
 				list_item->window_id = win_id;
 				list_item->ok_button_state = false;
@@ -273,11 +274,11 @@ void EditorWindow::SwapEditView(BMessage *msg)
 				{
 					if((list_item = GetListItem(win_id)) != NULL)
 					{
-						printf("GetListItem(win_id) wasn't NULL!\n");
+						//printf("GetListItem(win_id) wasn't NULL!\n");
 						// disable the ok button
 						ok_button->SetEnabled(false);
 					
-						// whole buncha jaz qith current_attr_name and friends
+						// whole buncha jaz with current_attr_name and friends
 						// delete current_attr_name
 						delete [] list_item->attr_name;
 						list_item->attr_name = NULL;
@@ -308,24 +309,26 @@ void EditorWindow::SwapEditView(BMessage *msg)
 							addonview = instantiate(bounds_rect, "Addon View", B_FOLLOW_ALL, B_WILL_DRAW, msg, &ret);
 							if(ret == B_NO_ERROR)
 							{
-								if(!current_view->IsHidden())
-									current_view->Hide();
+								while(current_view->IsHidden())
+									current_view->Show(); // make sure it's showing before we hide it
+								current_view->Hide();
 								//printf("EditorWindow::MessageReceived(). instantiated successfully!\n");
 								if(list_item->view != stub)
 								{
-									printf("EditorWindow::MessageReceived(). list_item->view != stub\n");
-									printf("EditorWindow::MessageReceived(). removing old addon view\n");
+									//printf("EditorWindow::MessageReceived(). list_item->view != stub\n");
+									//printf("EditorWindow::MessageReceived(). removing old addon view\n");
 									if(background->RemoveChild(list_item->view))
 									{
 										//if(remove->IsDirty())
 										//	SendAttributeToParent((AttrAddon *)remove); // save the data
 										delete list_item->view;
-										printf("EditorWindow::MessageReceived(). adding new addon view\n");
+										list_item->view = NULL;
+										//printf("EditorWindow::MessageReceived(). adding new addon view\n");
 										if(addonview != NULL)
 										{
 											list_item->view = addonview;
+											current_view = list_item->view;
 											background->AddChild(addonview);
-											current_view = addonview;
 											list_item->ok_button_state = true;
 											// - break -
 										}
@@ -335,7 +338,7 @@ void EditorWindow::SwapEditView(BMessage *msg)
 											list_item->attr_name = NULL;
 											list_item->view = stub;
 											current_view = stub;
-											if(current_view->IsHidden())
+											while(current_view->IsHidden())
 												current_view->Show();
 											list_item->attr_type = -1;
 											list_item->ok_button_state = false;
@@ -348,12 +351,12 @@ void EditorWindow::SwapEditView(BMessage *msg)
 								{
 									if(addonview != NULL)
 									{
-										if(!stub->IsHidden())
-											stub->Hide();
+										while(stub->IsHidden())
+											stub->Show();
+										stub->Hide();
 										list_item->view = addonview;
+										current_view = list_item->view;
 										background->AddChild(addonview);
-										current_view = addonview;
-										current_view->Show();
 										list_item->ok_button_state = true;
 									}
 									else // backup in case of screwy addon
@@ -362,7 +365,7 @@ void EditorWindow::SwapEditView(BMessage *msg)
 										list_item->attr_name = NULL;
 										list_item->view = stub;
 										current_view = stub;
-										if(current_view->IsHidden())
+										while(current_view->IsHidden())
 											current_view->Show();
 										list_item->attr_type = -1;
 										list_item->ok_button_state = false;
@@ -392,7 +395,7 @@ void EditorWindow::SwapEditView(BMessage *msg)
 					}
 					else
 					{
-						printf("GetListItem() returned a NULL ptr\n");
+						//printf("GetListItem() returned a NULL ptr\n");
 						ok_button->SetEnabled(false);
 						current_view = stub;
 						while(current_view->IsHidden())
@@ -429,6 +432,7 @@ void EditorWindow::SendAttributeToParent(AttrAddon *view)
 
 void EditorWindow::AttrWindowActivated(int32 window_id)
 {
+	//printf("Window %ld activated\n", window_id);
 	window_list_entry *list_item_cur = NULL, *list_item_new = NULL;
 	
 	list_item_new = GetListItem(window_id);
