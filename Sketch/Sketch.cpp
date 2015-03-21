@@ -24,7 +24,7 @@ main()
 }
 
 SketchApp::SketchApp()
-		  		  : BApplication("application/x.vnd-Prok.Sketch")
+		  		  : BApplication("application/x-vnd.Prok-Sketch")
 {
 	// most of this function was ripped out of Be's old HelloWorld Example
 	SketchWindow	*mainWindow = NULL;
@@ -185,7 +185,7 @@ BWindow * SketchApp::FindWindow(const char *title)
 {
 	BWindow *win = NULL;
 	int32 i = 0;
-	while(win = be_app->WindowAt(i++))
+	while((win = be_app->WindowAt(i++)) != NULL)
 	{
 		if(win->Lock())
 		{
@@ -204,7 +204,7 @@ BFilePanel * SketchApp::FindFilePanel()
 {
 	BFilePanel *win = NULL;
 	int32 i = 0;
-	while(win = (BFilePanel *)be_app->WindowAt(i++))
+	while((win = (BFilePanel *)be_app->WindowAt(i++)) != NULL)
 	{
 		if(!strcmp(class_name(win), "BFilePanel"))
 			return cast_as(win, BFilePanel);

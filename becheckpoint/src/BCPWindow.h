@@ -6,11 +6,18 @@
 
 #ifndef BCP_WINDOW_H
 #define BCP_WINDOW_H
+
+// interface kit
 #include <Window.h>
+#include <Rect.h>
+// app kit
 #include <Application.h>
-#include <string.h>
 #include <Message.h>
+// posix
+#include <string.h>
+
 #include "main.h"
+#include "LoginView.h"
 #include "BCPMessages.h"
 #include "ChangePassWindow.h"
 #include "PassControl.h"

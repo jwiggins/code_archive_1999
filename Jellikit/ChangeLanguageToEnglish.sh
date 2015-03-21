@@ -20,7 +20,7 @@ ELLIPSIS='…'
 xres -o $COPY_RESFILE -d CSTR $EXECUTABLE
 
 #erase all the executable's resources (all the type ignores are a bit kludgy)
-xres -d CSTR -d RAWT -d MSGG -d MIMS -d APPV -d APPF -o $EXECUTABLE $EXECUTABLE
+xres -d CSTR -d RAWT -d MSGG -d MIMS -d APPV -d APPF -d ICON -d MICN -o $EXECUTABLE $EXECUTABLE
 
 # dump a wad of strings into new resource file
 $XRES -a CSTR:0 -s "OK"

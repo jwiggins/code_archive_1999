@@ -79,7 +79,7 @@ BMessenger							*AttrMessenger;
 int32								window_count;
 int32								window_id_source;
 int32								next_untitled_number;
-bool								about_box_alive;
+bool								about_box_alive, media_server_is_alive;
 
 };
 

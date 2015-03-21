@@ -1,7 +1,4 @@
 #include "myFilter.h"
-#include <InterfaceDefs.h>
-#include "PassControl.h"
-#include <stdio.h>
 
 myFilter::myFilter()
 		: BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE, B_KEY_DOWN, NULL)

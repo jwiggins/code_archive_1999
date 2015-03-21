@@ -252,6 +252,11 @@ void AddAttrWindow::MessageReceived(BMessage *msg)
 			// "attribute" - the attribute - (starts out empty)
 			// "type" - the type_code of the attribute
 			// "addon id" - the image_id of the addon that can handle the attribute (ask the addon manager)
+			
+			// check for "other" attribute type first
+			if(current_type == 0)
+				break;
+			
 			BTextControl *name_text_control = (BTextControl *)FindView("attr name");
 			BMessage add_attribute(ADD_NEW_ATTRIBUTE);
 			const char *name;

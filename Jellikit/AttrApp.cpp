@@ -85,6 +85,12 @@ AttrApp::AttrApp()
 			AttrMessenger = new BMessenger(the_attr_manager);
 		}
 	}
+	
+	BMediaRoster::Roster(&err); // err will tell all!
+	if(err < B_NO_ERROR)
+		media_server_is_alive = false;
+	else
+		media_server_is_alive = true;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -118,8 +124,10 @@ bool AttrApp::QuitRequested()
 	if(the_attr_manager)
 		the_attr_manager->PostMessage(B_QUIT_REQUESTED); // only after windows are dead
 	
+	//printf("delete res_strings;\n");
 	delete res_strings;
 	
+	//printf("return BApplication::QuitRequested();\n");
 	return BApplication::QuitRequested();
 }
 
@@ -146,7 +154,7 @@ void AttrApp::AboutRequested()
 	if(!about_box_alive)
 	{
 		BRect rect = BScreen().Frame(); // get the screen rect
-		new JellikitAboutWindow(BRect((rect.Width()/2)-125, (rect.Height()/2)-75, (rect.Width()/2)+125, (rect.Height()/2)+75)); // the window should be 250 x 150
+		new JellikitAboutWindow(BRect((rect.Width()/2)-125, (rect.Height()/2)-75, (rect.Width()/2)+125, (rect.Height()/2)+75), media_server_is_alive); // the window should be 250 x 150
 		about_box_alive = true;
 		//printf("Your about box is showing.\n");
 	}
@@ -365,7 +373,7 @@ void AttrApp::MessageReceived(BMessage *msg)
 			window_count--;
 			if(!window_count)
 			{
-				Quit();
+				PostMessage(B_QUIT_REQUESTED);
 			}
 			break;
 		}

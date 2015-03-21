@@ -2,6 +2,15 @@
 #define MYFILTER_H
 
 #include <MessageFilter.h>
+#include <Message.h>
+#include <Handler.h>
+#include <InterfaceDefs.h>
+#include <SupportDefs.h>
+
+#include <stdio.h>
+
+#include "PassControl.h"
+
 
 class myFilter : public BMessageFilter {
 public:

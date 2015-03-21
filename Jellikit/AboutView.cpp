@@ -1,28 +1,49 @@
 #include "AboutView.h"
 
 AboutView::AboutView(BRect frame)
-	:BView(frame, "Jellikit!", B_FOLLOW_ALL, B_WILL_DRAW)
+	:BView(frame, "Jellikit!", B_FOLLOW_ALL, B_WILL_DRAW|B_PULSE_NEEDED)
 {
 	BRect bounds = Bounds(), rect;
-	BFont font(be_plain_font);
-	int32 interfaceUnit = ((int32)font.Size());
+	BFont font;
+	int32 interfaceUnit = ((int32)be_plain_font->Size());
 	font_height view_font_height;
 	BButton *button;
+	BTextView *text_view;
 	rgb_color black = {0,0,0,255};
 	const char *string_ptr;
 	
 	GetFont(&font);
-	font.SetSize(42.0);
+	font.SetSize(32.0);
 	font.GetHeight(&view_font_height);
 	// the rect enclosing the J in Jellikit
-	magic_rect.Set(5, (Bounds().Height()/4)-view_font_height.ascent, 5+(font.StringWidth("J")), Bounds().Height()/4);
+	magic_rect.Set(5, (bounds.Height()/5)-view_font_height.ascent, 5+(font.StringWidth("J")), bounds.Height()/5);
 	
+	// the ok button
 	string_ptr = ((AttrApp *)be_app)->res_strings->String(STRING_OK); // grab the "OK" string
 	rect.Set(bounds.right - interfaceUnit - (StringWidth(string_ptr)*3), bounds.bottom - interfaceUnit*3, bounds.right - interfaceUnit, bounds.bottom - interfaceUnit);
 	button = new BButton(rect, "button", string_ptr, new BMessage(B_QUIT_REQUESTED), B_FOLLOW_ALL, B_WILL_DRAW);
 	button->MakeDefault(true);
 	AddChild(button);
-	string_ptr = NULL;
+	
+	// the text view
+	rect.Set(interfaceUnit , 32. + interfaceUnit*2, bounds.right - interfaceUnit*3 - (StringWidth(string_ptr)*3), bounds.bottom - interfaceUnit);
+	text_view = new BTextView(rect, "text view", rect, B_FOLLOW_ALL, B_WILL_DRAW);
+	AddChild(text_view);
+	string_ptr = NULL; // we need the width of "OK" during the text_view construction
+	
+	// do the text rect
+	BRect text_rect = rect;
+	text_rect.InsetBy(2,2);
+	text_rect.OffsetTo(B_ORIGIN);
+	text_view->SetTextRect(text_rect);
+	text_view->MakeSelectable(false);
+	text_view->MakeEditable(false);
+	
+	// now set it's text to something interesting
+	text_view->SetText(
+		"1998-1999 by John Wiggins\n\nThanks to Dominic Giampaolo for writing bfs\n\n"
+		"Thanks to Brian Tietz for writing Santa's gift bag\n\n"
+		"And finally... Thanks to Primus for writing Jellikit, the song that this app was named after...\n\n");
 	
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetHighColor(black);
@@ -73,14 +94,39 @@ void AboutView::Draw(BRect update)
 	BFont font;
 	float cached_size;
 	
+	// draw the Jellikit string
 	GetFont(&font);
 	cached_size = font.Size();
-	font.SetSize(42.0); // its the answer!
+	font.SetSize(32.0);
 	SetFont(&font, B_FONT_SIZE);
-	DrawString("Jellikit", BPoint(5, Bounds().Height()/4)); // big
+	DrawString("Jellikit", BPoint(5, Bounds().Height()/5)); // big
 	
+	// draw the version string
 	font.SetSize(cached_size);
 	SetFont(&font, B_FONT_SIZE);
-	MovePenBy((-PenLocation().x) + 10, 15);
+	MovePenBy((-PenLocation().x) + 10, cached_size);
 	DrawString(version_string);
+	
+	// an outline around the textview
+	BView *view = FindView("text view");
+	BRect rect = view->Bounds();
+	rect.InsetBy(-1,-1);
+	StrokeRect(view->ConvertToParent(rect));
+}
+
+void AboutView::Pulse()
+{
+	// cheesy scroll action
+	BTextView *view = static_cast<BTextView *>(FindView("text view"));
+	static int32 textheight, viewheight;
+	
+	if(view)
+	{
+		textheight = view->TextHeight(0, view->TextLength());
+		viewheight = view->Bounds().Height();
+		if(view->LeftTop().y < (textheight + 1))
+			view->ScrollBy(0,1);
+		else
+			view->ScrollBy(0, -(textheight + viewheight + 1));
+	}
 }

@@ -20,49 +20,19 @@ main()
 // most of this constructor was stolen from Be's old HelloWorld example
 
 BCPApp::BCPApp()
-		  	: BApplication("application/x.vnd.Prok.BeCheckPoint")
+		  	: BApplication("application/x-vnd.Prok-BeCheckPoint")
 {
 	BCPWindow			*aWindow;
-	LoginView			*aView;
-	BMenuBar			*the_menubar;
-	BMenu				*the_menu;
 	BRect				aRect;
-	menu_info			m_info;
-	int32				menubarheight=0;
-	
+		
 	// generic inits for other members of the class
 	_password = NULL;
 	mail_daemon = false;
 	success = false;
-	
-	// Get the height of a menu given the current menu settings
-	get_menu_info(&m_info);
-	menubarheight = (int32)m_info.font_size + 8;
 
 	// set up a rectangle and instantiate a new window
-	aRect.Set(249, 249, 599, 324 + menubarheight);
+	aRect.Set(249, 249, 599, 349);
 	aWindow = new BCPWindow(aRect);
-	
-	// set up a rectangle and instantiate a new view
-	// view rect should be same size as window rect but with left top at (0, 0)
-	aRect.OffsetTo(B_ORIGIN);
-	aRect.OffsetBy(0, menubarheight);
-	aView = new LoginView(aRect, "Login View");
-	
-	// make yourself a happy little menu
-	aRect.Set(0,0, 350, menubarheight);
-	the_menubar = new BMenuBar(aRect, "menubar");
-	the_menu = new BMenu("BeCheckPoint");
-	the_menu->AddItem(new BMenuItem("Change Password", new BMessage(CHANGE_PASSWORD_DIALOG), 'P', B_COMMAND_KEY));
-	the_menu->AddItem(new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED), 'Q', B_COMMAND_KEY));
-	((BMenuItem *)the_menu->ItemAt(1))->SetTarget(be_app);
-	
-	the_menubar->AddItem(the_menu);
-	
-	// add views to window
-	aWindow->AddChild(the_menubar);
-	aWindow->AddChild(aView);
-	
 	
 	// make window visible
 	aWindow->Show();
@@ -96,7 +66,7 @@ void BCPApp::MessageReceived(BMessage *msg)
 			break;
 		case PASSWORD_CHANGE:
 			{
-				char *old_password, *new_password;
+				const char *old_password, *new_password;
 				
 				if(msg->FindString("oldpassword", &old_password) == B_NO_ERROR)
 				{
@@ -162,7 +132,7 @@ void BCPApp::ReadyToRun()
 		{
 			// show what the error was
 			char message[1024];
-			sprintf(message, "There was an error while reading the password: %s\n Setting your Password to the Default: \"none\"", strerror(err));
+			sprintf(message, "There was an error while reading the password:\n %s\n Setting your Password to the Default: \"none\"", strerror(err));
 			(new BAlert("didnt read password", message ,"ok"))->Go();
 			set_pass("none");
 			//printf("set_pass(). password: %s\n", _password);
@@ -180,7 +150,7 @@ BWindow * BCPApp::FindWindow(const char *title)
 {
 	BWindow *win = NULL;
 	int32 i = 0;
-	while(win = be_app->WindowAt(i++))
+	while((win = be_app->WindowAt(i++)) != NULL)
 	{
 		if(win->Lock())
 		{

@@ -84,6 +84,8 @@ class ColumnListView : public BListView
  		virtual void ScrollTo(BPoint point);
  		virtual void SelectionChanged();
  		virtual	void MouseDown(BPoint point);
+ 		virtual void MouseUp(BPoint point);
+ 		virtual void MouseMoved(BPoint point, uint32 code, const BMessage *msg);
  		virtual	bool InitiateDrag(BPoint point, int32 index, bool wasSelected);
  
 		//List functions
@@ -126,5 +128,9 @@ class ColumnListView : public BListView
 		float fDataWidth,fDataHeight,fPageWidth,fPageHeight;
 		BList fSortKeyList;		//List contains CLVColumn pointers
 		BList fFullItemList;
+		
+		// my stuff
+		bool mouse_is_down, currently_dragging;
+		BPoint mouse_down_point;
 };
 #endif

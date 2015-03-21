@@ -52,10 +52,14 @@ AppResStrings::AppResStrings()
 		{
 			a_string = (char *)malloc(strlen(string_ptr) + 1);
 			strcpy(a_string, string_ptr);
-			StringList->AddItem((void *)a_string, i);
 		}
 		else
-			StringList->AddItem((void *)default_string_table[i], i);
+		{
+			a_string = (char *)malloc(strlen(default_string_table[i]) + 1);
+			strcpy(a_string, default_string_table[i]);
+		}
+		// a copy exists regardless...
+		StringList->AddItem((void *)a_string, i);
 		
 		a_string = NULL;
 	}

@@ -1,7 +1,7 @@
 #include "AboutWindow.h"
 
-JellikitAboutWindow::JellikitAboutWindow(BRect frame)
-: BWindow(frame, "", /*B_TITLED_WINDOW_LOOK*/B_MODAL_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL, B_NOT_ZOOMABLE|B_NOT_RESIZABLE)
+JellikitAboutWindow::JellikitAboutWindow(BRect frame, bool have_media)
+: BWindow(frame, "", /*B_TITLED_WINDOW_LOOK*/B_MODAL_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL, B_NOT_ZOOMABLE|B_NOT_RESIZABLE), media_server_is_alive(have_media)
 {
 	BResources *resources;
 	const void *sound_rez = NULL;
@@ -20,16 +20,11 @@ JellikitAboutWindow::JellikitAboutWindow(BRect frame)
 	
 	resources = NULL; // stop pointing
 	
-	// check for the media server
-	BMediaRoster::Roster(&err); // err will tell all!
-	if(err < B_NO_ERROR)
-		media_server_is_alive = false;
-	else
-		media_server_is_alive = true;
-	
-	
 	// install an AboutView
 	AddChild(new AboutView(Bounds()));
+	
+	// set the pulse rate for the about view
+	SetPulseRate(100 * 1000);
 	
 	// show!
 	Show();
@@ -50,9 +45,7 @@ void JellikitAboutWindow::MessageReceived(BMessage *msg)
 	switch(msg->what)
 	{
 		case DO_EASTER_EGG:
-		{
-			status_t err = B_ERROR; // we need to check the return val of some calls
-			
+		{			
 			//printf("JellikitAboutWindow: got an easter egg message.\n");
 			// jellikit.raw is 16bit stereo lendian
 			if(sound_ptr == NULL) // fail if we don't have the sound
@@ -62,28 +55,11 @@ void JellikitAboutWindow::MessageReceived(BMessage *msg)
 				break;
 			//printf("JellikitAboutWindow: media_server is alive.\n");
 			
-			//printf("JellikitAboutWindow: playing easter egg sound.\n");
-			BSoundPlayer player; // make a vanilla soundplayer
-			BSoundPlayer::play_id id; // make an id for later
-			media_raw_audio_format format; // make a format to fill w/ info
-			
-			//printf("JellikitAboutWindow: BSoundPlayer constructed.\n");
-			format.frame_rate = 44100.; // 44.1 khz sample rate
-			format.channel_count = 2; // stereo
-			format.format = media_raw_audio_format::B_AUDIO_SHORT; // 16 bit
-			format.byte_order = B_MEDIA_LITTLE_ENDIAN; // little endian
-			format.buffer_size = 4096; // This was a guess, but it sounds good
-			
-			//printf("JellikitAboutWindow: starting the soundplayer...\n");
-			err = player.Start(); // start the player
-			if(err == B_NO_ERROR)
+			if(find_thread("jellikit:easteregg") < 0)
 			{
-				//printf("JellikitAboutWindow: adjusting volume.\n");
-				player.SetVolume(1.); // jack the volume up
-				//printf("JellikitAboutWindow: playing sound.\n");
-				id = player.StartPlaying(new BSound((void *)sound_ptr, rez_size, format)); // play the sound
-				player.WaitForSound(id); // wait for it to finish
+				resume_thread(spawn_thread(EasterEgg, "jellikit:easteregg", B_NORMAL_PRIORITY, (void *)this));
 			}
+			
 			break;
 		}
 		default:
@@ -92,4 +68,38 @@ void JellikitAboutWindow::MessageReceived(BMessage *msg)
 			break;
 		}
 	}
+}
+
+int32 JellikitAboutWindow::EasterEgg(void *data)
+{
+	((JellikitAboutWindow *)data)->PlayEESound();
+	return B_OK;
+}
+
+int32 JellikitAboutWindow::PlayEESound()
+{
+	//printf("JellikitAboutWindow: playing easter egg sound.\n");
+	status_t err = B_ERROR; // we need to check the return val of some calls
+	BSoundPlayer player; // make a vanilla soundplayer
+	BSoundPlayer::play_id id; // make an id for later
+	media_raw_audio_format format; // make a format to fill w/ info
+	
+	//printf("JellikitAboutWindow: BSoundPlayer constructed.\n");
+	format.frame_rate = 44100.; // 44.1 khz sample rate
+	format.channel_count = 2; // stereo
+	format.format = media_raw_audio_format::B_AUDIO_SHORT; // 16 bit
+	format.byte_order = B_MEDIA_LITTLE_ENDIAN; // little endian
+	format.buffer_size = 4096; // This was a guess, but it sounds good
+	
+	//printf("JellikitAboutWindow: starting the soundplayer...\n");
+	err = player.Start(); // start the player
+	if(err == B_NO_ERROR)
+	{
+		//printf("JellikitAboutWindow: adjusting volume.\n");
+		player.SetVolume(1.); // jack the volume up
+		//printf("JellikitAboutWindow: playing sound.\n");
+		id = player.StartPlaying(new BSound((void *)sound_ptr, rez_size, format)); // play the sound
+		player.WaitForSound(id); // wait for it to finish
+	}
+	return B_OK;
 }

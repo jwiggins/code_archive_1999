@@ -578,91 +578,101 @@ void ColumnListView::MouseDown(BPoint point)
 {
 	BListView::MouseDown(point);
 	//printf("ColumnListView::MouseDown()\n");
+	
 	if(!Window()->IsActive())
 		Window()->Activate();
+	
+	SetMouseEventMask(B_POINTER_EVENTS);
+	mouse_is_down = true;
 }
-#include "dbg_head.h"
-bool ColumnListView::InitiateDrag(BPoint point, int32 index, bool wasSelected)
+
+void ColumnListView::MouseUp(BPoint point)
 {
-	// drag & drop
+	//printf("ColumnListView::MouseUp()\n");
+	mouse_is_down = false;
+	currently_dragging = false;
+}
+
+//#include "dbg_head.h"
+#include "drag_icon.h"
+void ColumnListView::MouseMoved(BPoint point, uint32 code, const BMessage *msg)
+{
+	//printf("ColumnListView::MouseMoved()\n");
+	if(!mouse_is_down || currently_dragging)
+		return;
+	
 	BMessage drag_msg(DRAGGED_ATTRIBUTE);
 	BBitmap *drag_bitmap, *icon_bitmap;
-	BPoint drag_point, peek_point;
+	BPoint drag_point;
 	BView *a_view;
 	const char *name_ptr;
 	float name_width=0.;
 	
-	AttrItem *selected = static_cast<AttrItem *>(ItemAt(index));
+	AttrItem *selected = static_cast<AttrItem *>(ItemAt(CurrentSelection()));
 	AttrWindow *window = static_cast<AttrWindow *>(Window());
 	
-	bigtime_t mouse_pause=0;
-	uint32 buttons;
-	
 	icon_bitmap = new BBitmap(BRect(0,0,15,15), B_COLOR_8_BIT);
-	memcpy(icon_bitmap->Bits(), (void *)kDBGheadBits, icon_bitmap->BitsLength()); // "DBGhead" edition
+	memcpy(icon_bitmap->Bits(), (void *)kIconBits, icon_bitmap->BitsLength()); // "normal" edition
+	//memcpy(icon_bitmap->Bits(), (void *)kDGBheadBits, icon_bitmap->BitsLength()); // "Dominic G" edition
 	
+	if(selected != NULL)
+	{
+		// cache a pointer
+		name_ptr = selected->AttrName();
+		// fill the drag message
+		// "name", "type", "addon?", "addon id", "win id"
+		drag_msg.AddString("name", name_ptr);
+		drag_msg.AddString("type", selected->TypeName());
+		drag_msg.AddBool("addon?", selected->HasAddon());
+		drag_msg.AddInt32("addon id", selected->Id());
+		drag_msg.AddInt32("win id", window->ID());
+		// make the drag bitmap
+		//printf("StringWidth\n");
+		name_width = be_plain_font->StringWidth(name_ptr);
+		//printf("ctors\n");
+		drag_bitmap = new BBitmap(BRect(0,0,20 + name_width,15), B_COLOR_8_BIT, true);
+		a_view = new BView(BRect(0,0,20 + name_width, 15), "draw view", B_FOLLOW_ALL, 0);
+		//printf("AddChild\n");
+		//a_view->SetViewColor(B_TRANSPARENT_32_BIT);
+		a_view->SetLowColor(B_TRANSPARENT_32_BIT);
+		drag_bitmap->AddChild(a_view);
+		//printf("DrawBitmap\n");
+		if(drag_bitmap->Lock())
+		{
+			a_view->FillRect(a_view->Bounds(), B_SOLID_LOW);
+			a_view->DrawBitmap(icon_bitmap);
+			//printf("DrawString\n");
+			a_view->SetDrawingMode(B_OP_ALPHA);
+			//a_view->SetLowColor(255,255,255,64);
+			a_view->DrawString(name_ptr, BPoint(20, 12));
+			//printf("Sync\n");
+			a_view->Sync();
+			drag_bitmap->Unlock();
+		}
+		// yahoo
+		if(drag_msg.CountNames(B_ANY_TYPE) == 5)
+		{
+			drag_point.x = mouse_down_point.x;
+			drag_point.y = (int32)mouse_down_point.y % ((int32)ItemFrame(CurrentSelection()).Height() + 1);
+			DragMessage(&drag_msg, drag_bitmap, B_OP_ALPHA, drag_point);
+			//DragMessage(&drag_msg, drag_bitmap, B_OP_BLEND, drag_point);
+			currently_dragging = true;
+		}
+	}
+	// clean up
+	delete icon_bitmap;
+}
+
+bool ColumnListView::InitiateDrag(BPoint point, int32 index, bool wasSelected)
+{
+	//printf("ColumnListView::InitiateDrag()\n");
+	
+	mouse_down_point = point;
+
 	if(!wasSelected)
 		Select(index); // select it if it wasn't already selected
 	
-	// grab the user defined mouse click speed
-	//if(get_click_speed(&mouse_pause) == B_OK)
-	//{
-	//	snooze(mouse_pause<<1); // snooze for half that amount of time
-	//	GetMouse(&peek_point, &buttons, true); // get fresh mouse state
-	//	if(point != peek_point)
-	//	{
-	//	if(buttons) // if the button is still down, go ahead with the drag
-	//	{
-			if(selected != NULL)
-			{
-				// fill the drag message
-				// "name", "type", "addon?", "addon id", "win id"
-				drag_msg.AddString("name", selected->AttrName());
-				drag_msg.AddString("type", selected->TypeName());
-				drag_msg.AddBool("addon?", selected->HasAddon());
-				drag_msg.AddInt32("addon id", selected->Id());
-				drag_msg.AddInt32("win id", window->ID());
-				// make the drag bitmap
-				//printf("selected->AttrName\n");
-				name_ptr = selected->AttrName();
-				//printf("StringWidth\n");
-				name_width = be_plain_font->StringWidth(name_ptr);
-				//printf("ctors\n");
-				drag_bitmap = new BBitmap(BRect(0,0,20 + name_width,15), B_COLOR_8_BIT, true);
-				a_view = new BView(BRect(0,0,20 + name_width, 15), "draw view", B_FOLLOW_ALL, 0);
-				//printf("AddChild\n");
-				//a_view->SetViewColor(B_TRANSPARENT_32_BIT);
-				a_view->SetLowColor(B_TRANSPARENT_32_BIT);
-				drag_bitmap->AddChild(a_view);
-				//printf("DrawBitmap\n");
-				drag_bitmap->Lock();
-				a_view->FillRect(a_view->Bounds(), B_SOLID_LOW);
-				a_view->DrawBitmap(icon_bitmap);
-				//printf("DrawString\n");
-				a_view->SetDrawingMode(B_OP_ALPHA);
-				//a_view->SetLowColor(255,255,255,64);
-				a_view->DrawString(name_ptr, BPoint(20, 12));
-				//printf("Sync\n");
-				a_view->Sync();
-				drag_bitmap->Unlock();
-				if(drag_bitmap->RemoveChild(a_view))
-					delete a_view; 
-				// yahoo
-				if(drag_msg.CountNames(B_ANY_TYPE) == 5)
-				{
-					drag_point.x = point.x; drag_point.y = (int32)point.y % ((int32)ItemFrame(index).Height() + 2);
-					DragMessage(&drag_msg, drag_bitmap, B_OP_ALPHA, drag_point);
-					//DragMessage(&drag_msg, drag_bitmap, B_OP_BLEND, drag_point);
-					
-					return true;
-				}
-			}
-	//	}
-	//	}
-	//}
-	
-	// otherwise return the default
-	return BListView::InitiateDrag(point, index, wasSelected);
+	return true;
 }
 
 bool ColumnListView::AddList(BList* newItems)

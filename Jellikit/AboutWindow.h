@@ -25,11 +25,14 @@
 
 class JellikitAboutWindow : public BWindow {
 public:
-						JellikitAboutWindow(BRect frame);
+						JellikitAboutWindow(BRect frame, bool have_media);
 virtual	bool			QuitRequested();
 virtual	void			MessageReceived(BMessage *msg);
 
 private:
+static	int32			EasterEgg(void *data);
+int32					PlayEESound();
+
 char					*sound_ptr;
 size_t					rez_size;
 bool					media_server_is_alive;

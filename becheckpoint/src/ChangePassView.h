@@ -9,6 +9,8 @@
 
 #include <View.h>
 #include <Button.h>
+#include <Message.h>
+
 #include "PassControl.h"
 
 class ChangePassView : public BView {

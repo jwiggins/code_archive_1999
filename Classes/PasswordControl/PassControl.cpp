@@ -60,13 +60,15 @@ void PassControl::SetText(const char *text)
 			star_string[j] = '*';
 		else
 		{
-			while(!(text[i] & 0x40)
+			while(!(text[i] & 0x40))
 				i++;
 			star_string[j] = '*';
 		}
 	}
 	
 	BTextControl::SetText(star_string);
+	
+	delete [] star_string;
 }
 
 void PassControl::PopChar()

@@ -22,12 +22,12 @@ void ChangePassView::AttachedToWindow()
 	BRect			rect, bounds = Bounds();
 	int32			interfaceUnit=0;
 	
-	BFont font(be_fixed_font);
-	interfaceUnit = ((int32)font.Size());
+	interfaceUnit = ((int32)be_fixed_font->Size());
 	
 	rect.Set(interfaceUnit, interfaceUnit, (bounds.right - StringWidth("enter")) - (interfaceUnit*3), interfaceUnit*3);
 	old = new PassControl(rect, "old", "old", NULL, new BMessage(DUMMY));
 	AddChild(old);
+	old->MakeFocus();
 	
 	rect.Set(interfaceUnit, interfaceUnit*3, (bounds.right - StringWidth("enter")) - (interfaceUnit*3), interfaceUnit<<2);
 	_new = new PassControl(rect, "new", "new", NULL, new BMessage(DUMMY));

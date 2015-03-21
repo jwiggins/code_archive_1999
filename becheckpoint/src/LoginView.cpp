@@ -22,13 +22,14 @@ void LoginView::AttachedToWindow()
 	BRect			rect, bounds = Bounds();
 	int32			interfaceUnit=0;
 	
-	BFont font(be_fixed_font);
-	interfaceUnit = ((int32)font.Size());
+	interfaceUnit = ((int32)be_fixed_font->Size());
 	
 	rect.Set(interfaceUnit, interfaceUnit<<1, (bounds.right - StringWidth("enter")) - (interfaceUnit*3), interfaceUnit*3);
 	
 	password = new PassControl(rect, "password", "password", NULL, new BMessage(DUMMY));
 	AddChild(password);
+	
+	password->MakeFocus();
 	
 	rect.Set((bounds.right - StringWidth("enter")) - (interfaceUnit<<1), interfaceUnit<<1, (bounds.right - interfaceUnit), interfaceUnit*3);
 	enter = new BButton(rect, "enter", "enter", new BMessage(BUTTON_PRESS));

@@ -4,6 +4,7 @@
 // interface
 #include <View.h>
 #include <Button.h>
+#include <TextView.h>
 #include <Window.h>
 // mine
 #include "AttrApp.h"
@@ -18,6 +19,7 @@ public:
 					~AboutView();
 virtual	void		MouseDown(BPoint point);
 virtual	void		Draw(BRect update);
+virtual	void		Pulse();
 
 private:
 BRect				magic_rect; // where to click fo da eastuh egg

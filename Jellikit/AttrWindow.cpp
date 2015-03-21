@@ -9,7 +9,7 @@
 #include "AttrItem.h"
 
 AttrWindow::AttrWindow(BRect frame, const char *title, BMessage *config_msg, BLooper *addon_manager, BLooper *attribute_manager, EditorWindow *edit_window, AddAttrWindow *add_attr_window, int32 id)
-			: BWindow(frame, title, B_DOCUMENT_WINDOW_LOOK,B_NORMAL_WINDOW_FEEL,/*B_WILL_ACCEPT_FIRST_CLICK*/0), _id_(id)
+			: BWindow(frame, title, B_DOCUMENT_WINDOW_LOOK,B_NORMAL_WINDOW_FEEL,/*B_WILL_ACCEPT_FIRST_CLICK*//*B_ASYNCHRONOUS_CONTROLS*/0), _id_(id)
 {
 	BRect		rect, bounds = frame;
 	int32		width = (int32)bounds.Width();
@@ -110,7 +110,7 @@ void AttrWindow::MessageReceived(BMessage *msg)
 			// "new type" - string - new mimestring for file
 			const char *new_type;
 			
-			printf("Got BEOS_TYPE_CHANGE msg\n");
+			//printf("Got BEOS_TYPE_CHANGE msg\n");
 			if(msg->FindString("new type", &new_type) == B_NO_ERROR)
 				FileTypeChanged(new_type);
 			break;

@@ -1,0 +1,92 @@
+<TITLE>SheepShaver</TITLE>
+<BODY BGCOLOR="#FFFFFF">
+<h2>SheepShaver Update</H2><P>
+25 February 1998 (YABOSCU) - SheepShaver received extensive updates.<P>
+
+ Compatibility:<BR>
+   SheepShaver runs MacOS 7.5.2 thru 8.1 with all system extensions like
+   AppleGuide, AppleScript, QuickTime, QuickDraw 3D, Open Transport, PPP,
+   Language Kits, ColorSync, etc. Applications we have successfully tested
+   include PhotoShop 4.0, PageMaker 6.0, Illustrator 6.0, ClarisWorks 4.0,
+   Netscape 3.0, RealPC, Marathon Trilogy, Quake and F/A-18 Hornet.
+   The only real compatibility problem we have found so far (apart from
+   incompatibilities due to as-yet unimplemented features) is that the
+   QuickTime Cinepak decoder doesn't work. We are currently investigating
+   this problem.<P>
+
+ Graphics:<BR>
+   8-bit windowed modes in 640x480 and 800x600 resolutions, and 8/16/24-bit
+   full-screen modes in 6 standard resolutions (from 640x480 up to 1600x1200)
+   are available. The full-screen modes are accelerated (acceleration is
+   limited to rectangle blitting/filling/inversion for now). Video modes are
+   switched with the MacOS Monitors control panel.<P>
+
+ Sound:<BR>
+   Sound output is in 44.1 kHz, 16-bit stereo. Seems to work fine.<P>
+
+ Networking:<BR>
+   SheepShaver supports Ethernet networking at the data-link level with an
+   Open Transport Ethernet driver. This implies that the "Mac" and the "Be"
+   side have two different network addresses. All protocol stacks should work
+   correctly (we have tested AppleTalk and TCP/IP). The speed is still below
+   expectations (perhaps a BeOS problem?). Network stability has been extensively
+   tested during a 4 hour networked marathon session yesterday.<P>
+
+ Serial communications:<BR>
+   Both the modem and printer port are supported (on a BeBox, you can assign
+   them to any of the 4 serial ports). MacOS terminal programs and
+   Open Transport/PPP have been tested. For unknown reasons there are a lot
+   of transmission errors (which might also be a BeOS problem).<P>
+
+ Volumes:<BR>
+   If a volume can be mounted under BeOS it can be mounted under ShapeShifter
+   (this includes Zip/Jaz/SyQuest drives etc.), so you can continue to use your
+   existing MacOS installation. Unlike BeOS, we also support HFS+. Additionally,
+   you can use hard disk files and mount uncompressed disk images. SheepShaver
+   also features a built-in CD-ROM driver with basic audio functions and a
+   floppy disk driver.<P>
+
+ Other features:<BR>
+  - Text can be copied between the Mac and Be sides via the clipboard<BR>
+  - The amount of RAM assigned to the MacOS is adjustable<BR>
+  - Nifty 3D graphics in the "About" dialog<BR>
+  - SheepShaver _does_ run on a BeBox, but you will have to provide a PowerMac
+    ROM file yourself<P>
+
+Under development:<BR>
+
+ - Sound input<BR>
+ - Copying of graphics via the clipboard<BR>
+
+Features we are thinking about that will (probably) not be in the first
+release but which might be implemented in the future:
+
+ - Accelerated 3D graphics via QuickDraw RAVE<BR>
+ - SCSI Manager 4.3 emulation<BR>
+ - Access to ADB devices like graphics tablets, joysticks and dongles<BR>
+ - Support for Bt848 video digitizers<BR>
+ - MIDI<BR>
+ - BeOS<->MacOS communications<P>
+ 
+What will (probably) never be supported:<BR>
+
+ - LocalTalk<BR>
+ - Programs which access Mac hardware directly (the only one we've found
+   so far is MacBench 4.0)<P>
+
+As SheepShaver requires BeOS R3, its release is tied to the release of
+BeOS R3 for PowerPC (which, according to Be, is in April). If you already
+have access to BeOS R3 (i.e. you are beta testing (or developing for Be) you can contact 
+them for becoming a SheepShaver beta tester. A public beta or demo will be released after 
+the BeDC (mid-March), but unless you have BeOS R3, it will not be of much use to you.
+<BR><BR><P>
+<a href="mailto:hellwig@iphcip1.physik.uni-mainz.de">Contact SheepShaver Developers</a><P>
+<a href="http://www.sheepshaver.com">SheepShaver</a><P>
+
+<P>
+<BR><BR><B>
+<!-- start of NedStat code -->
+<a href="http://usa.nedstat.net/cgi-bin/viewstat?name=jesda">
+<img src="http://usa.nedstat.net/cgi-bin/nedstat.gif?name=jesda" border=0 alt="" width=22 
+height=22></a>
+<!-- end of NedStat code -->

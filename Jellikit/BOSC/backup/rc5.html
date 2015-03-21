@@ -1,0 +1,114 @@
+<html>
+<head>
+<title>Team BeOS Central.</title>
+</head>
+<body bgcolor="#ffffff" link="#ff0000">
+<center>
+<img src="teampagelogo.gif" alt="team beos central">
+</center>
+<b>Background</b> 
+<p>Team BeOS Central was started shortly after the start of the RC5-64 contest when John 
+Wiggins found out that there was no BeOS related team. Since then, we have ascended to the 
+upper half of the top 100 teams and we continue to tear through the keys.
+<h3>Our team's number is: 1178 </h3>
+<p>If you dont understand (or don't like) my instructions, Distributed.net has their own 
+<a href="http://www.distributed.net/FAQ/teamfaq.html">FAQ</a> for joining a team.
+<p>For more general distributed.net questions, consult their FAQ page at 
+<a href="http://www.distributed.net/FAQ/">this URL</a>
+<ol><h3>Instructions for joining Team BeOS Central.</h3>
+<li>Get the latest BeOS rc5des client with the 
+<a href="http://www.distributed.net/cgi/select.cgi">client autoselector</a>
+<li>put the client and its files in /boot/home/config/bin.
+<li>Start up your client and enter <strong>YOUR</strong> email address for the notification address. 
+<pre> 
+/boot/home> rc5des -config
+Detected 1 cpu(s)
+
+RC5DES v2.7019.402 client - a project of distributed.net
+Copyright distributed.net 1997
+Visit http://www.distributed.net/ for more information.  '/boot/home/config/bin/
+rc5des HELP' for usage
+
+
+CLIENT CONFIG MENU
+------------------
+1)  Email to report as [default:rc5@distributed.net] ==> YOUR EMAIL GOES HERE
+2)  RC5 Blocks to Buffer [in:out] [default:10] ==> 10:10
+3)  DES Blocks to Buffer [in:out] [default:10] ==> 10:10
+4)  Blocks to complete in run [default:0] ==> 0
+5)  Hours to complete in a run [default:0.0] ==> 0.000000
+6)  Keys per timeslice - for Macs, Win16, etc [default:65536] ==> 65536
+7)  Level of niceness to run at [default:0] ==> 0
+8)  File to log to [default:] ==>
+9)  Network communication mode [default:1] ==> 1
+17)  Message Mailing (bytes) [default:0] ==> 0
+22)  Number of CPUs in this machine [default:-1 (autodetect)] ==> -1
+23)  RC5 Checkpoint information filename [default:none] ==> none
+24)  DES Checkpoint information filename [default:none] ==> none
+26)  Preferred Block Size (2^28 through 2^31)  [default:30] ==> 30
+27)  Preferred Contest (1=RC5, 2=DES)  [default:2] ==> 2
+0)  Quit and Save
+Choice -->   
+</pre>
+<li>Now wait for your email address to show up at 
+<a href="http://rc5stats.distributed.net">http://rc5stats.distributed.net</a> (or whatever the stats page is for the current distributed.net contest)
+<li>Once your email address shows up, click the link that mails a password to you.
+<li>Soon there will be a feild at the bottom of your personal stats page where you can edit your information by using the password you were given.
+<li>Go to this edit your info page. On this page there will be a feild where you can enter Team BeOS Central's team number. Put 1178 in that feild.
+<li>Your blocks have now been added to Team BeOS Centrals blocks.
+<li>add this line to your /boot/home/config/boot/UserBootscript: 
+<pre>
+rc5des&
+</pre>
+<p>(this assumes that all the rc5 stuff is in /boot/home/config/bin)
+<li>Continue Participation :)
+</ol>
+<p>Even if you do not have unlimited connectivity, you can still leave your client running 24/7 (we need to crunch more blocks! :) with a few simple prefs changes.
+<ol>
+<li>open up the terminal.
+<pre>
+/boot/home> rc5des -config
+Detected 1 cpu(s)
+
+RC5DES v2.7019.402 client - a project of distributed.net
+Copyright distributed.net 1997
+Visit http://www.distributed.net/ for more information.  '/boot/home/config/bin/
+rc5des HELP' for usage
+
+
+CLIENT CONFIG MENU
+------------------
+1)  Email to report as [default:rc5@distributed.net] ==> YOUR EMAIL HERE
+2)  RC5 Blocks to Buffer [in:out] [default:10] ==> **10:10**
+3)  DES Blocks to Buffer [in:out] [default:10] ==> **10:10**
+4)  Blocks to complete in run [default:0] ==> 0
+5)  Hours to complete in a run [default:0.0] ==> 0.000000
+6)  Keys per timeslice - for Macs, Win16, etc [default:65536] ==> 65536
+7)  Level of niceness to run at [default:0] ==> 0
+8)  File to log to [default:] ==>
+9)  Network communication mode [default:1] ==> 1
+17)  Message Mailing (bytes) [default:0] ==> 0
+22)  Number of CPUs in this machine [default:-1 (autodetect)] ==> -1
+23)  RC5 Checkpoint information filename [default:none] ==> none
+24)  DES Checkpoint information filename [default:none] ==> none
+26)  Preferred Block Size (2^28 through 2^31)  [default:30] ==> 30
+27)  Preferred Contest (1=RC5, 2=DES)  [default:2] ==> 2
+0)  Quit and Save
+Choice --> 
+</pre>
+<li>choose choice #2 
+<li>at the prompt, enter the number of blocks you think your computer can do on average in between internet connection times. hit return.
+<li>enter the same number at the next prompt. hit return.
+<li> choose choice #3 and feed it the same numbers
+<li>now that you are back at the main prompt, enter choice 0 and hit return.
+<li>from now on, whenever you connect to the internet, open up the terminal and type:
+<pre>
+$ rc5des -update
+</pre>
+this will freshen up all your buffers
+<li>now all you gotta do is sit back, relax, and leave your machine on all the time. :)
+</ol>
+<p><a href="/">Back to BeOS Central</a>
+
+</body>
+</html> 

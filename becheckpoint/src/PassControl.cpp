@@ -1,7 +1,4 @@
 #include "PassControl.h"
-#include "myFilter.h"
-#include <Font.h>
-
 
 PassControl::PassControl(BRect frame,
 						const char *name,
@@ -32,6 +29,42 @@ PassControl::~PassControl()
 	}
 	// else leak();
 	delete [] actual;
+}
+
+void PassControl::SetText(const char *text)
+{
+	// what? you don't wanna send a volley of messages for a password you
+	// read out of a file? fine then..... 
+	
+	// text is NULL terminated
+	int32 text_len = strlen(text);
+	char *star_string = NULL;
+	star_string = new char [ text_len + 1];
+	memset(star_string, 0, text_len + 1); // appease the MALLOC_DEBUG gods
+	
+	delete [] actual;
+	actual = NULL;
+	actual = new char [ text_len + 1];
+	strcpy(actual, text);
+	
+	length = text_len;
+	actual_size = text_len + 1;
+	
+	// fill star_string with an appropriate # of stars
+	for(int i=0,j=0; i<=text_len; i++,j++)
+	{
+		// Handle UTF8:
+		if (!(text[i] & 0x80))
+			star_string[j] = '*';
+		else
+		{
+			while(!(text[i] & 0x40))
+				i++;
+			star_string[j] = '*';
+		}
+	}
+	
+	BTextControl::SetText(star_string);
 }
 
 void PassControl::PopChar()
